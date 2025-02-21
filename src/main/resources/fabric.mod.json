@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "oxidizium",
+  "version": "${version}",
+  "name": "Oxidizium",
+  "description": "Implementing Minecraft In Rust",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/iron_oxide/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "com.github.tatercertified.oxidizium.Oxidizium"
+    ]
+  },
+  "mixins": [
+    "oxidizium.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
