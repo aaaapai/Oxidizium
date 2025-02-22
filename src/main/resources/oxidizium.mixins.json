@@ -4,6 +4,7 @@
   "package": "com.github.tatercertified.oxidizium.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "MathHelperMixin"
   ],
   "client": [
   ],
