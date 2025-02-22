@@ -2,3 +2,10 @@
 
 .qodo
 /jextract-22 - Shortcut.lnk
+
+.qodo
+*.lock
+/build
+/.idea
+/.idea
+/.gradle
