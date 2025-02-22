@@ -1,4 +1,5 @@
 use ape_table_trig::*;
+use once_cell::sync::Lazy;
 
 const APPROXIMATION_THRESHOLD: f32 = 1.0E-5;
 const PACKED_DEGREES_CONSTANT: f32 = 360.0 / 256.0;
@@ -6,8 +7,27 @@ const UNPACKED_DEGREES_CONSTANT: f32 = 256.0 / 360.0;
 const MULTIPLY_DE_BRUIJN_BIT_POS: [i32; 32] = [
     0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
 ];
+const ROUNDER_256THS: f64 = f64::from_bits(4805340802404319232);
+const DOUBLE_PI: f32 = std::f32::consts::PI * 2.0;
 
 static TABLE: [f32; 65536] = trig_table_gen_f32!(65536);
+static ARCSIN_TABLE: Lazy<[f64; 257]> = Lazy::new(|| {
+    let mut table = [0.0; 257];
+    for i in 0..257 {
+        let d = i as f64 / 256.0;
+        table[i] = d.asin();
+    }
+    table
+});
+
+static COSIN_OF_ARCSIN_TABLE: Lazy<[f64; 257]> = Lazy::new(|| {
+    let mut table = [0.0; 257];
+    for i in 0..257 {
+        let d = i as f64 / 256.0;
+        table[i] = d.asin().cos();
+    }
+    table
+});
 
 /// Computes the sine of an input, x, in radians
 pub fn sin(x: f32) -> f32 {
@@ -181,7 +201,7 @@ pub fn wrap_degrees_int(degrees: i32) -> i32 {
 
 /// Forces degrees into +/- 180
 pub fn wrap_degrees_long(degrees: i64) -> f32 {
-    ((degrees % 360 as i64) as f32 + 540.0) % 360.0 - 180.0
+    ((degrees % 360_i64) as f32 + 540.0) % 360.0 - 180.0
 }
 
 /// Forces degrees into +/- 180
@@ -228,7 +248,7 @@ pub fn step_unwrapped_angle_towards(from: f32, to: f32, step: f32) -> f32 {
 /// Parses the int.
 /// If the parse fails, it reverts to fallback
 pub fn parse_int(string: String, fallback: i32) -> i32 {
-    i32::from_str(&string).unwrap_or(fallback)
+    string.parse::<i32>().unwrap_or(fallback)
 }
 
 /// Gets the smallest power of two
@@ -254,7 +274,7 @@ pub fn ceil_log_2(mut value: i32) -> i32 {
     } else {
         smallest_encompassing_power_of_two(value)
     };
-    MULTIPLY_DE_BRUIJN_BIT_POS[(value as i64 * 125613361 >> 27) as i32 & 31]
+    MULTIPLY_DE_BRUIJN_BIT_POS[(((value as i64 * 125613361) >> 27) as i32 & 31) as usize]
 }
 
 /// Takes the floor of log2(value) using the de Bruijn sequence
@@ -275,7 +295,7 @@ pub fn fractional_part_double(value: f64) -> f64 {
 /// Generates a hash code
 pub fn hash_code(x: i32, y: i32, z: i32) -> i64 {
     let mut l: i64 = (x * 3129871) as i64 ^ (z as i64 * 116129781) ^ y as i64;
-    l = l * l * 42317861 + l * 11 as i64;
+    l = l * l * 42317861 + l * 11_i64;
     l >> 16
 }
 
@@ -313,20 +333,125 @@ pub fn atan_2(mut y: f64, mut x: f64) -> f64 {
         let bl3: bool = y > x;
         if bl3 {
             let e: f64 = x;
-            x = y;
-            y = e;
+            std::mem::swap(&mut x, &mut y)
         }
 
         // TODO Fast inverse square
+        let e: f64 = inverse_sqrt_double(d);
+        x *= e;
+        y *= e;
+        let f: f64 = ROUNDER_256THS + y;
+        let i: i32 = f.to_bits() as i32;
+        let asin_table: ArcSinTable = ArcSinTable::new(&ARCSIN_TABLE[..], &COSIN_OF_ARCSIN_TABLE[..]);
+        let g: f64 = asin_table.asin(i as usize);
+        let h: f64 = asin_table.cos_of_asin(i as usize);
+        let j: f64 = f - ROUNDER_256THS;
+        let k: f64 = y * h - x * j;
+        let l: f64 = (6.0 + k * k) * k * 0.16666666666666666;
+        let mut m: f64 = g + l;
+        if bl3 {
+            m = std::f64::consts::FRAC_PI_2 - m;
+        }
+
+        if bl2 {
+            m = std::f64::consts::PI - m;
+        }
+
+        if bl {
+            m = -m;
+        }
+
+        m
     }
 }
 
-pub fn inverse_sqrt(x: f32) {
-    
+/// Gets the inverse of the square root of x
+pub fn inverse_sqrt_float(x: f32) -> f32 {
+    1.0 / x.sqrt()
 }
 
+/// Gets the inverse of the square root of x
+pub fn inverse_sqrt_double(x: f64) -> f64 {
+    1.0 / x.sqrt()
+}
 
-/// Linear Interpolation from start to end over delta time
+/// Approximation of 1 / cbrt(x)
+pub fn fast_inverse_cbrt(x: f32) -> f32 {
+    let mut i: i32 = x.to_bits() as i32;
+    i = 1419967116 - i / 3;
+    let mut f: f32 = f32::from_bits(i.try_into().unwrap());
+    f = 0.6666667 * f + 1.0 / (3.0 * f * f * x);
+    0.6666667 * f + 1.0 / (3.0 * f * f * x)
+}
+
+/// Converts HSV to RGB Values
+pub fn hsv_to_rgb(hue: f32, saturation: f32, value: f32) -> i32 {
+    hsv_to_argb(hue, saturation, value, 0)
+}
+
+/// Converts HSV to ARGB values
+pub fn hsv_to_argb(hue: f32, saturation: f32, value: f32, alpha: i32) -> i32 {
+    let i = (hue * 6.0).floor() as i32 % 6;
+    let f = hue * 6.0 - i as f32;
+    let g = value * (1.0 - saturation);
+    let h = value * (1.0 - f * saturation);
+    let j = value * (1.0 - (1.0 - f) * saturation);
+
+    let (k, l, m) = match i {
+        0 => (value, j, g),
+        1 => (h, value, g),
+        2 => (g, value, j),
+        3 => (g, h, value),
+        4 => (j, g, value),
+        5 => (value, g, h),
+        _ => panic!("Something went wrong when converting from HSV to RGB. Input was {}, {}, {}", hue, saturation, value),
+    };
+
+    let r = (k * 255.0).clamp(0.0, 255.0) as i32;
+    let g = (l * 255.0).clamp(0.0, 255.0) as i32;
+    let b = (m * 255.0).clamp(0.0, 255.0) as i32;
+
+    (alpha << 24) | (r << 16) | (g << 8) | b
+}
+
+/// Creates an ideal hash
+pub fn ideal_hash(mut value: i32) -> i32 {
+    value ^= signed_shift(value, 16) as i32;
+    value *= -2048144789;
+    value ^= signed_shift(value, 13) as i32;
+    value *= -1028477387;
+    value ^ signed_shift(value, 16) as i32
+}
+
+/// Rust equivalent of the Java ">>>" operator
+fn signed_shift(value: i32, shift: u32) -> u32 {
+    (value as u32) >> shift
+}
+
+/// Performs a binary search looking for the predicate F
+/// The function can be used as show here:
+/// ```rust
+/// let result = binary_search(0, 100, |x| x >= 50);
+/// ```
+pub fn binary_search<F>(mut min: i32, max: i32, predicate: F) -> i32
+where
+    F: Fn(i32) -> bool,
+{
+    let mut i = max - min;
+    while i > 0 {
+        let j = i / 2;
+        let k = min + j;
+        if predicate(k) {
+            i = j;
+        } else {
+            min = k + 1;
+            i -= j + 1;
+        }
+    }
+    min
+}
+
+/// Linear Interpolation f-rom start to end over delta time
 pub fn lerp_float(delta: f32, start: f32, end: f32) -> f32 {
     start + (delta * (end - start))
 }
@@ -359,7 +484,185 @@ pub fn lerp_3(
     x1y0z1: f64,
     x0y1z1: f64,
     x1y1z1: f64
-) {
-    lerp_double(delta_z, lerp_2(delta_x, delta_y, x0y0z0, x1y0z0, x0y1z0, x1y1z0), lerp_2(delta_x, delta_y, x0y0z1, x1y0z1, x0y1z1, x1y1z1));
+) -> f64 {
+    lerp_double(delta_z, lerp_2(delta_x, delta_y, x0y0z0, x1y0z0, x0y1z0, x1y1z0), lerp_2(delta_x, delta_y, x0y0z1, x1y0z1, x0y1z1, x1y1z1))
+}
+
+/// Interpolates a point on the Catmull-Rom Spline
+pub fn catmull_rom(delta: f32, p0: f32, p1: f32, p2: f32, p3: f32) -> f32 {
+    0.5 * (2.0 * p1 + (p2 - p0) * delta + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * delta * delta + (3.0 * p1 - p0 - 3.0 * p2 + p3) * delta * delta * delta)
+}
+
+/// Fades a value using Perlin
+pub fn perlin_fade(value: f64) -> f64 {
+    value * value * value * (value * (value * 6.0 - 15.0) + 10.0)
+}
+
+/// Derivative of the Perlin Fade function
+pub fn perlin_fade_derivative(value: f64) -> f64 {
+    30.0 * value * value * (value - 1.0) * (value - 1.0)
+}
+
+/// Gets the sign of a value
+pub fn sign(value: f64) -> i32 {
+    if value == 0.0 {
+        0
+    } else {
+        value.signum() as i32
+    }
+}
+
+/// Performs Linear Interpolation on an angle
+pub fn lerp_angle_degrees_float(delta: f32, start: f32, end: f32) -> f32 {
+    start + delta * wrap_degrees_float(end - start)
+}
+
+/// Performs Linear Interpolation on an angle
+pub fn lerp_angle_degrees_double(delta: f64, start: f64, end: f64) -> f64 {
+    start + delta * wrap_degrees_double(end - start)
+}
+
+/// Performs Linear Interpolation on an angle
+pub fn lerp_angle_radians(delta: f32, start: f32, end: f32) -> f32 {
+    let mut f: f32 = end - start;
+
+    while f < -std::f32::consts::PI {
+        f += DOUBLE_PI;
+    }
+
+    while f >= std::f32::consts::PI {
+        f -= DOUBLE_PI;
+    }
+
+    start + delta * f
+}
+
+/// Wraps a number around after it hits the max deviation
+pub fn wrap(value: f32, max_deviation: f32) -> f32 {
+    ((value % max_deviation - max_deviation * 0.5).abs() - max_deviation * 0.25) / (max_deviation * 0.25)
+}
+
+/// Squares a value
+pub fn square_float(value: f32) -> f32 {
+    value * value
+}
+
+/// Squares a value
+pub fn square_double(value: f64) -> f64 {
+    value * value
+}
+
+/// Squares a value
+pub fn square_int(value: i32) -> i32 {
+    value * value
+}
+
+/// Squares a value
+pub fn square_long(value: i64) -> i64 {
+    value * value
+}
+
+/// Linearly maps a value from one number range to another and clamps the result
+pub fn clamped_map_double(value: f64, old_start: f64, old_end: f64, new_start: f64, new_end: f64) -> f64 {
+    clamp_lerp_double(new_start, new_end, get_lerp_progress_double(value, old_start, old_end))
+}
+
+/// Linearly maps a value from one number range to another and clamps the result
+pub fn clamped_map_float(value: f32, old_start: f32, old_end: f32, new_start: f32, new_end: f32) -> f32 {
+    clamp_lerp_float(new_start, new_end, get_lerp_progress_float(value, old_start, old_end))
+}
+
+/// Linearly maps a value from one number range to another, unclamped
+pub fn map_double(value: f64, old_start: f64, old_end: f64, new_start: f64, new_end: f64) -> f64 {
+    lerp_double(get_lerp_progress_double(value, old_start, old_end), new_start, new_end)
+}
+
+/// Linearly maps a value from one number range to another, unclamped
+pub fn map_float(value: f32, old_start: f32, old_end: f32, new_start: f32, new_end: f32) -> f32 {
+    lerp_float(get_lerp_progress_float(value, old_start, old_end), new_start, new_end)
+}
+
+// method_34957
+
+/// Returns a value farther than or as far as value from zero that is a multiple of divisor
+pub fn round_up_to_multiple(value: i32, divisor: i32) -> i32 {
+    ceil_div(value, divisor) * divisor
+}
+
+/// Divides then ceilings
+pub fn ceil_div(a: i32, b: i32) -> i32 {
+    -floor_div(-a, b)
+}
+
+// nextBetween
+// nextGaussian
+
+/// A^2 + B^2
+pub fn squared_hypot(a: f64, b: f64) -> f64 {
+    a * a + b * b
+}
+
+/// Gets the hypotenuse length
+pub fn hypot_double(a: f64, b: f64) -> f64 {
+    squared_hypot(a, b).sqrt()
+}
+
+/// Gets the hypotenuse length
+pub fn hypot_float(a: f32, b: f32) -> f32 {
+    squared_hypot(a as f64, b as f64).sqrt() as f32
+}
+
+/// Gets the magnitude squared
+pub fn squared_magnitude(a: f64, b: f64, c: f64) -> f64 {
+    a * a + b * b + c * c
+}
+
+/// Gets the magnitude of the vector
+pub fn magnitude_double(a: f64, b: f64, c: f64) -> f64 {
+    squared_magnitude(a, b, c).sqrt()
+}
+
+/// Gets the magnitude of the vector
+pub fn magnitude_float(a: f32, b: f32, c: f32) -> f32 {
+    squared_magnitude(a as f64, b as f64, c as f64) as f32
+}
+
+/// Returns a rounded down to the nearest multiple of b.
+pub fn round_down_to_multiple(a: f32, b: i32) -> i32 {
+    (a / b as f32).floor() as i32 * b
+}
+
+// stream
+
+// rotateAround
+
+// multiplyFraction
+
+/// Gradual sine function
+pub fn ease_in_out_sine(value: f32) -> f32 {
+    let table = TrigTableF32::new(&TABLE);
+    -(table.cos(std::f32::consts::PI * value) - 1.0) / 2.0
+}
+
+struct ArcSinTable<'a> {
+    arcsin: &'a [f64],
+    cosin_of_arcsin: &'a [f64],
+}
+
+impl<'a> ArcSinTable<'a> {
+    pub fn new(arcsin: &'a [f64], cosin_of_arcsin: &'a [f64]) -> Self {
+        ArcSinTable {
+            arcsin,
+            cosin_of_arcsin,
+        }
+    }
+
+    pub fn asin(&self, i: usize) -> f64 {
+        self.arcsin[i]
+    }
+
+    pub fn cos_of_asin(&self, i: usize) -> f64 {
+        self.cosin_of_arcsin[i]
+    }
 }
 

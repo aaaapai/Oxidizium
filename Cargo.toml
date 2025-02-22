@@ -8,3 +8,4 @@ path = "src/main/rust/lib.rs"
 
 [dependencies]
 ape-table-trig = "0.2.0"
+once_cell = "1.20.3"
