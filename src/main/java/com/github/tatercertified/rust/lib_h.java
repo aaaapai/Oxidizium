@@ -15480,64 +15480,6 @@ public class lib_h {
         }
     }
 
-    private static class tan_float {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            lib_h.C_FLOAT,
-            lib_h.C_FLOAT
-        );
-
-        public static final MemorySegment ADDR = lib_h.findOrThrow("tan_float");
-
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
-    }
-
-    /**
-     * Function descriptor for:
-     * {@snippet lang=c :
-     * float tan_float(float x)
-     * }
-     */
-    public static FunctionDescriptor tan_float$descriptor() {
-        return tan_float.DESC;
-    }
-
-    /**
-     * Downcall method handle for:
-     * {@snippet lang=c :
-     * float tan_float(float x)
-     * }
-     */
-    public static MethodHandle tan_float$handle() {
-        return tan_float.HANDLE;
-    }
-
-    /**
-     * Address for:
-     * {@snippet lang=c :
-     * float tan_float(float x)
-     * }
-     */
-    public static MemorySegment tan_float$address() {
-        return tan_float.ADDR;
-    }
-
-    /**
-     * {@snippet lang=c :
-     * float tan_float(float x)
-     * }
-     */
-    public static float tan_float(float x) {
-        var mh$ = tan_float.HANDLE;
-        try {
-            if (TRACE_DOWNCALLS) {
-                traceDowncall("tan_float", x);
-            }
-            return (float)mh$.invokeExact(x);
-        } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
-        }
-    }
-
     private static class sqrt_float {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             lib_h.C_FLOAT,
@@ -18420,6 +18362,66 @@ public class lib_h {
         }
     }
 
+    private static class lerp_int {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            lib_h.C_INT,
+            lib_h.C_FLOAT,
+            lib_h.C_INT,
+            lib_h.C_INT
+        );
+
+        public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_int");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * int32_t lerp_int(float delta, int32_t start, int32_t end)
+     * }
+     */
+    public static FunctionDescriptor lerp_int$descriptor() {
+        return lerp_int.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * int32_t lerp_int(float delta, int32_t start, int32_t end)
+     * }
+     */
+    public static MethodHandle lerp_int$handle() {
+        return lerp_int.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * int32_t lerp_int(float delta, int32_t start, int32_t end)
+     * }
+     */
+    public static MemorySegment lerp_int$address() {
+        return lerp_int.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * int32_t lerp_int(float delta, int32_t start, int32_t end)
+     * }
+     */
+    public static int lerp_int(float delta, int start, int end) {
+        var mh$ = lerp_int.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("lerp_int", delta, start, end);
+            }
+            return (int)mh$.invokeExact(delta, start, end);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class lerp_float {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             lib_h.C_FLOAT,
@@ -18542,10 +18544,10 @@ public class lib_h {
 
     private static class lerp_positive {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            lib_h.C_INT,
             lib_h.C_FLOAT,
-            lib_h.C_FLOAT,
-            lib_h.C_FLOAT,
-            lib_h.C_FLOAT
+            lib_h.C_INT,
+            lib_h.C_INT
         );
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_positive");
@@ -18556,7 +18558,7 @@ public class lib_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * float lerp_positive(float delta, float start, float end)
+     * int32_t lerp_positive(float delta, int32_t start, int32_t end)
      * }
      */
     public static FunctionDescriptor lerp_positive$descriptor() {
@@ -18566,7 +18568,7 @@ public class lib_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * float lerp_positive(float delta, float start, float end)
+     * int32_t lerp_positive(float delta, int32_t start, int32_t end)
      * }
      */
     public static MethodHandle lerp_positive$handle() {
@@ -18576,7 +18578,7 @@ public class lib_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * float lerp_positive(float delta, float start, float end)
+     * int32_t lerp_positive(float delta, int32_t start, int32_t end)
      * }
      */
     public static MemorySegment lerp_positive$address() {
@@ -18585,16 +18587,16 @@ public class lib_h {
 
     /**
      * {@snippet lang=c :
-     * float lerp_positive(float delta, float start, float end)
+     * int32_t lerp_positive(float delta, int32_t start, int32_t end)
      * }
      */
-    public static float lerp_positive(float delta, float start, float end) {
+    public static int lerp_positive(float delta, int start, int end) {
         var mh$ = lerp_positive.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("lerp_positive", delta, start, end);
             }
-            return (float)mh$.invokeExact(delta, start, end);
+            return (int)mh$.invokeExact(delta, start, end);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20164,7 +20166,7 @@ public class lib_h {
     private static class round_down_to_multiple {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             lib_h.C_INT,
-            lib_h.C_FLOAT,
+            lib_h.C_DOUBLE,
             lib_h.C_INT
         );
 
@@ -20176,7 +20178,7 @@ public class lib_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * int32_t round_down_to_multiple(float a, int32_t b)
+     * int32_t round_down_to_multiple(double a, int32_t b)
      * }
      */
     public static FunctionDescriptor round_down_to_multiple$descriptor() {
@@ -20186,7 +20188,7 @@ public class lib_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * int32_t round_down_to_multiple(float a, int32_t b)
+     * int32_t round_down_to_multiple(double a, int32_t b)
      * }
      */
     public static MethodHandle round_down_to_multiple$handle() {
@@ -20196,7 +20198,7 @@ public class lib_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * int32_t round_down_to_multiple(float a, int32_t b)
+     * int32_t round_down_to_multiple(double a, int32_t b)
      * }
      */
     public static MemorySegment round_down_to_multiple$address() {
@@ -20205,10 +20207,10 @@ public class lib_h {
 
     /**
      * {@snippet lang=c :
-     * int32_t round_down_to_multiple(float a, int32_t b)
+     * int32_t round_down_to_multiple(double a, int32_t b)
      * }
      */
-    public static int round_down_to_multiple(float a, int b) {
+    public static int round_down_to_multiple(double a, int b) {
         var mh$ = round_down_to_multiple.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {

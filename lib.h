@@ -14,11 +14,6 @@ float sin_float(float x);
 float cos_float(float x);
 
 /**
- * Computes the tangent of an input, x, in radians
- */
-float tan_float(float x);
-
-/**
  * Square roots the input x
  */
 float sqrt_float(float x);
@@ -264,7 +259,12 @@ int32_t hsv_to_argb(float hue, float saturation, float value, int32_t alpha);
 int32_t ideal_hash(int32_t value);
 
 /**
- * Linear Interpolation f-rom start to end over delta time
+ * Linear Interpolation from start to end over delta time
+ */
+int32_t lerp_int(float delta, int32_t start, int32_t end);
+
+/**
+ * Linear Interpolation from start to end over delta time
  */
 float lerp_float(float delta, float start, float end);
 
@@ -276,7 +276,7 @@ double lerp_double(double delta, double start, double end);
 /**
  * Linear Interpolation that always returns positive if delta is positive
  */
-float lerp_positive(float delta, float start, float end);
+int32_t lerp_positive(float delta, int32_t start, int32_t end);
 
 /**
  * Two-dimensional Linear Interpolation
@@ -429,7 +429,7 @@ float magnitude_float(float a, float b, float c);
 /**
  * Returns a rounded down to the nearest multiple of b.
  */
-int32_t round_down_to_multiple(float a, int32_t b);
+int32_t round_down_to_multiple(double a, int32_t b);
 
 /**
  * Gradual sine function

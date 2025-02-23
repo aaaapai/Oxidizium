@@ -1,5 +1,5 @@
-use ape_table_trig::*;
 use once_cell::sync::Lazy;
+use std::num::Wrapping;
 
 const APPROXIMATION_THRESHOLD: f32 = 1.0E-5;
 const PACKED_DEGREES_CONSTANT: f32 = 360.0 / 256.0;
@@ -10,7 +10,14 @@ const MULTIPLY_DE_BRUIJN_BIT_POS: [i32; 32] = [
 const ROUNDER_256THS: f64 = f64::from_bits(4805340802404319232);
 const DOUBLE_PI: f32 = std::f32::consts::PI * 2.0;
 
-static TABLE: [f32; 65536] = trig_table_gen_f32!(65536);
+static SINE_TABLE: Lazy<[f32; 65536]> = Lazy::new(|| {
+    let mut table = [0.0_f32; 65536];
+    for i in 0..65536 {
+        table[i] = (i as f32 * DOUBLE_PI / 65536.0_f32).sin();
+    }
+    table
+});
+
 static ARCSIN_TABLE: Lazy<[f64; 257]> = Lazy::new(|| {
     let mut table = [0.0; 257];
     for i in 0..257 {
@@ -32,22 +39,15 @@ static COSIN_OF_ARCSIN_TABLE: Lazy<[f64; 257]> = Lazy::new(|| {
 /// Computes the sine of an input, x, in radians
 #[no_mangle]
 pub extern "C" fn sin_float(x: f32) -> f32 {
-    let table = TrigTableF32::new(&TABLE);
-    table.sin(x)
+    let sin_table = LookUpTableFloat::new(&SINE_TABLE[..]);
+    sin_table.sin(x)
 }
 
 /// Computes the cosine of an input, x, in radians
 #[no_mangle]
 pub extern "C" fn cos_float(x: f32) -> f32 {
-    let table = TrigTableF32::new(&TABLE);
-    table.cos(x)
-}
-
-/// Computes the tangent of an input, x, in radians
-#[no_mangle]
-pub extern "C" fn tan_float(x: f32) -> f32 {
-    let table = TrigTableF32::new(&TABLE);
-    table.tan(x)
+    let cos_table = LookUpTableFloat::new(&SINE_TABLE[..]);
+    cos_table.cos(x)
 }
 
 /// Square roots the input x
@@ -242,7 +242,7 @@ pub extern "C" fn wrap_degrees_float(degrees: f32) -> f32 {
 /// Forces degrees into +/- 180
 #[no_mangle]
 pub extern "C" fn wrap_degrees_double(degrees: f64) -> f64 {
-    ((degrees % 360.0) + 540.0) % 360.0
+    ((degrees % 360.0) + 540.0) % 360.0 - 180.0
 }
 
 /// Subtracts end from start
@@ -340,7 +340,8 @@ pub extern "C" fn fractional_part_double(value: f64) -> f64 {
 #[no_mangle]
 pub extern "C" fn hash_code(x: i32, y: i32, z: i32) -> i64 {
     let mut l: i64 = (x * 3129871) as i64 ^ (z as i64 * 116129781) ^ y as i64;
-    l = l * l * 42317861 + l * 11_i64;
+    let wrapping_l = Wrapping(l);
+    l = (wrapping_l * wrapping_l * Wrapping(42317861) + wrapping_l * Wrapping(11_i64)).0;
     l >> 16
 }
 
@@ -389,9 +390,10 @@ pub extern "C" fn atan_2(mut y: f64, mut x: f64) -> f64 {
         y *= e;
         let f: f64 = ROUNDER_256THS + y;
         let i: i32 = f.to_bits() as i32;
-        let asin_table: ArcSinTable = ArcSinTable::new(&ARCSIN_TABLE[..], &COSIN_OF_ARCSIN_TABLE[..]);
+        let asin_table: LookUpTableDouble = LookUpTableDouble::new(&ARCSIN_TABLE[..]);
         let g: f64 = asin_table.asin(i as usize);
-        let h: f64 = asin_table.cos_of_asin(i as usize);
+        let cos_table: LookUpTableDouble = LookUpTableDouble::new(&COSIN_OF_ARCSIN_TABLE[..]);
+        let h: f64 = cos_table.cos_of_asin(i as usize);
         let j: f64 = f - ROUNDER_256THS;
         let k: f64 = y * h - x * j;
         let l: f64 = (6.0 + k * k) * k * 0.16666666666666666;
@@ -470,9 +472,9 @@ pub extern "C" fn hsv_to_argb(hue: f32, saturation: f32, value: f32, alpha: i32)
 #[no_mangle]
 pub extern "C" fn ideal_hash(mut value: i32) -> i32 {
     value ^= signed_shift(value, 16) as i32;
-    value *= -2048144789;
+    value = (Wrapping(value) * Wrapping(-2048144789)).0;
     value ^= signed_shift(value, 13) as i32;
-    value *= -1028477387;
+    value = (Wrapping(value) * Wrapping(-1028477387)).0;
     value ^ signed_shift(value, 16) as i32
 }
 
@@ -506,7 +508,13 @@ where
     min
 }
 
-/// Linear Interpolation f-rom start to end over delta time
+/// Linear Interpolation from start to end over delta time
+#[no_mangle]
+pub extern "C" fn lerp_int(delta: f32, start: i32, end: i32) -> i32 {
+    start + (delta * (end - start) as f32).floor() as i32
+}
+
+/// Linear Interpolation from start to end over delta time
 #[no_mangle]
 pub extern "C" fn lerp_float(delta: f32, start: f32, end: f32) -> f32 {
     start + (delta * (end - start))
@@ -518,10 +526,12 @@ pub extern "C" fn lerp_double(delta: f64, start: f64, end: f64) -> f64 {
     start + (delta * (end - start))
 }
 
+// lerp_vec3d
+
 /// Linear Interpolation that always returns positive if delta is positive
 #[no_mangle]
-pub extern "C" fn lerp_positive(delta: f32, start: f32, end: f32) -> f32 {
-    start + (delta * (end - start - 1.0)).floor() + if delta > 0.0 { 1.0 } else { 0.0 }
+pub extern "C" fn lerp_positive(delta: f32, start: i32, end: i32) -> i32 {
+    start + (delta * (end - start - 1) as f32).floor() as i32 + if delta > 0.0 { 1 } else { 0 }
 }
 
 /// Two-dimensional Linear Interpolation
@@ -713,8 +723,8 @@ pub extern "C" fn magnitude_float(a: f32, b: f32, c: f32) -> f32 {
 
 /// Returns a rounded down to the nearest multiple of b.
 #[no_mangle]
-pub extern "C" fn round_down_to_multiple(a: f32, b: i32) -> i32 {
-    (a / b as f32).floor() as i32 * b
+pub extern "C" fn round_down_to_multiple(a: f64, b: i32) -> i32 {
+    (a / b as f64).floor() as i32 * b
 }
 
 // stream
@@ -726,29 +736,43 @@ pub extern "C" fn round_down_to_multiple(a: f32, b: i32) -> i32 {
 /// Gradual sine function
 #[no_mangle]
 pub extern "C" fn ease_in_out_sine(value: f32) -> f32 {
-    let table = TrigTableF32::new(&TABLE);
-    -(table.cos(std::f32::consts::PI * value) - 1.0) / 2.0
+    let cos_table = LookUpTableFloat::new(&SINE_TABLE[..]);
+    -(cos_table.cos(std::f32::consts::PI * value) - 1.0) / 2.0
 }
 
-struct ArcSinTable<'a> {
-    arcsin: &'a [f64],
-    cosin_of_arcsin: &'a [f64],
+struct LookUpTableDouble<'a> {
+    table: &'a [f64],
 }
 
-impl<'a> ArcSinTable<'a> {
-    pub fn new(arcsin: &'a [f64], cosin_of_arcsin: &'a [f64]) -> Self {
-        ArcSinTable {
-            arcsin,
-            cosin_of_arcsin,
-        }
+impl<'a> LookUpTableDouble<'a> {
+    pub fn new(table: &'a [f64]) -> Self {
+        LookUpTableDouble { table }
     }
 
     pub fn asin(&self, i: usize) -> f64 {
-        self.arcsin[i]
+        self.table[i]
     }
 
     pub fn cos_of_asin(&self, i: usize) -> f64 {
-        self.cosin_of_arcsin[i]
+        self.table[i]
+    }
+}
+
+struct LookUpTableFloat<'a> {
+    table: &'a [f32],
+}
+
+impl<'a> LookUpTableFloat<'a> {
+    pub fn new(table: &'a [f32]) -> Self {
+        LookUpTableFloat { table }
+    }
+
+    pub fn sin(&self, rad: f32) -> f32 {
+        self.table[((rad * 10430.378_f32) as i32 & 65535) as usize]
+    }
+
+    pub fn cos(&self, rad: f32) -> f32 {
+        self.table[((rad * 10430.378_f32 + 16384.0_f32) as i32 & 65535) as usize]
     }
 }
 

@@ -487,19 +487,23 @@ public class MathHelperMixin {
         return lib_h.ideal_hash(value);
     }
 
-    // TODO Fix: Missin
-    /*
+    /**
+     * @author QPCrummer
+     * @reason Implement in Rust
+     */
     @Overwrite
     public static int lerp(float delta, int start, int end) {
+        return lib_h.lerp_int(delta, start, end);
     }
-     */
 
-    // TODO Fix: Missing
-    /*
+    /**
+     * @author QPCrummer
+     * @reason Implement in Rust
+     */
     @Overwrite
     public static int lerpPositive(float delta, int start, int end) {
+        return lib_h.lerp_positive(delta, start, end);
     }
-     */
 
     /**
      * @author QPCrummer
@@ -765,12 +769,14 @@ public class MathHelperMixin {
         return lib_h.magnitude_float(a, b, c);
     }
 
-    // TODO Fix: a should be a f64
-    /*
+    /**
+     * @author QPCrummer
+     * @reason Implement in Rust
+     */
     @Overwrite
     public static int roundDownToMultiple(double a, int b) {
+        return lib_h.round_down_to_multiple(a, b);
     }
-     */
 
     /**
      * @author QPCrummer
