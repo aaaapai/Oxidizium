@@ -15372,7 +15372,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("sin_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -15430,7 +15430,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("cos_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -15488,7 +15488,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("sqrt_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -15546,7 +15546,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("floor_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -15604,7 +15604,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("floor_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -15662,7 +15662,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("floor_long");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -15720,7 +15720,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("abs_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -15778,7 +15778,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("abs_int");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -15836,7 +15836,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("ceil_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -15894,7 +15894,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("ceil_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -15954,7 +15954,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("clamp_int");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16014,7 +16014,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("clamp_long");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16074,7 +16074,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("clamp_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16134,7 +16134,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("clamp_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16194,7 +16194,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("clamp_lerp_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16254,7 +16254,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("clamp_lerp_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16313,7 +16313,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("abs_max");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16372,7 +16372,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("floor_div");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16431,7 +16431,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("approximately_equals_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16490,7 +16490,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("approximately_equals_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16549,7 +16549,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("floor_mod_int");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16608,7 +16608,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("floor_mod_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16667,7 +16667,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("floor_mod_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16726,7 +16726,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("is_multiple_of");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16784,7 +16784,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("pack_degrees");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16842,7 +16842,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("unpack_degrees");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16900,7 +16900,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("wrap_degrees_int");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -16958,7 +16958,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("wrap_degrees_long");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17016,7 +17016,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("wrap_degrees_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17074,7 +17074,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("wrap_degrees_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17133,7 +17133,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("subtract_angles");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17192,7 +17192,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("angle_between");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17252,7 +17252,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("clamp_angle");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17312,7 +17312,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("step_towards");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17372,7 +17372,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("step_unwrapped_angle_towards");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17430,7 +17430,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("smallest_encompassing_power_of_two");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17488,7 +17488,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("is_power_of_two");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17546,7 +17546,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("ceil_log_2");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17604,7 +17604,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("floor_log_2");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17662,7 +17662,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("fractional_part_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17720,7 +17720,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("fractional_part_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17780,7 +17780,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("hash_code");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17840,7 +17840,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("get_lerp_progress_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17900,7 +17900,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("get_lerp_progress_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -17959,7 +17959,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("atan_2");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18017,7 +18017,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("inverse_sqrt_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18075,7 +18075,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("inverse_sqrt_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18133,7 +18133,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("fast_inverse_cbrt");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18193,7 +18193,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("hsv_to_rgb");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18254,7 +18254,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("hsv_to_argb");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18312,7 +18312,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("ideal_hash");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18372,7 +18372,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_int");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18432,7 +18432,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18492,7 +18492,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18552,7 +18552,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_positive");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18615,7 +18615,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_2");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18683,7 +18683,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_3");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18745,7 +18745,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("catmull_rom");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18803,7 +18803,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("perlin_fade");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18861,7 +18861,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("perlin_fade_derivative");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18919,7 +18919,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("sign");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -18979,7 +18979,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_angle_degrees_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19039,7 +19039,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_angle_degrees_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19099,7 +19099,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("lerp_angle_radians");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19158,7 +19158,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("wrap");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19216,7 +19216,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("square_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19274,7 +19274,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("square_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19332,7 +19332,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("square_int");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19390,7 +19390,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("square_long");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19452,7 +19452,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("clamped_map_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19514,7 +19514,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("clamped_map_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19576,7 +19576,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("map_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19638,7 +19638,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("map_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19697,7 +19697,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("round_up_to_multiple");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19756,7 +19756,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("ceil_div");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19815,7 +19815,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("squared_hypot");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19874,7 +19874,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("hypot_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19933,7 +19933,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("hypot_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -19993,7 +19993,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("squared_magnitude");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -20053,7 +20053,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("magnitude_double");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -20113,7 +20113,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("magnitude_float");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -20172,7 +20172,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("round_down_to_multiple");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
@@ -20230,7 +20230,7 @@ public class lib_h {
 
         public static final MemorySegment ADDR = lib_h.findOrThrow("ease_in_out_sine");
 
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(false));
     }
 
     /**
