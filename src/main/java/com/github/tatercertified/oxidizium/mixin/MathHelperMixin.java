@@ -1,6 +1,5 @@
 package com.github.tatercertified.oxidizium.mixin;
 
-import com.github.tatercertified.rust.lib_h;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;

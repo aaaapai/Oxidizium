@@ -14,7 +14,7 @@
       "com.github.tatercertified.oxidizium.Oxidizium"
     ],
     "preLaunch": [
-      "com.github.tatercertified.oxidizium.LoadRustDll"
+      "com.github.tatercertified.oxidizium.LoadRustBinary"
     ]
   },
   "mixins": [
@@ -22,7 +22,7 @@
   ],
   "depends": {
     "fabricloader": "*",
-    "minecraft": "${minecraft_version}",
+    "minecraft": ">=1.21.4",
     "java": ">=22"
   }
 }

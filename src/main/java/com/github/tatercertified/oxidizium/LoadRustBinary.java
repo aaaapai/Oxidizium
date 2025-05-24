@@ -1,0 +1,64 @@
+package com.github.tatercertified.oxidizium;
+
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Locale;
+
+public class LoadRustBinary implements PreLaunchEntrypoint {
+    @Override
+    public void onPreLaunch() {
+        String osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+        String arch = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH);
+
+        String binaryName = switch (osName) {
+            case "linux" -> switch (arch) {
+                case "amd64", "x86_64" -> "liboxidizium_linux_x64.so";
+                case "arm64", "aarch64" -> "liboxidizium_linux_arm64.so";
+                default -> throw new IllegalStateException("Unsupported architecture: " + arch);
+            };
+            case "windows" -> switch (arch) {
+                case "amd64", "x86_64" -> "oxidizium_windows_x64.dll";
+                case "arm", "aarch64" -> "oxidizium_windows_arm64.dll";
+                default -> throw new IllegalStateException("Unsupported architecture: " + arch);
+            };
+            case "mac" -> switch (arch) {
+                case "x86_64" -> "liboxidizium_mac_x64.dylib";
+                case "arm64", "aarch64" -> "liboxidizium_mac_arm64.dylib";
+                default -> throw new IllegalStateException("Unsupported architecture: " + arch);
+            };
+            default -> throw new IllegalStateException("Unsupported OS: " + osName);
+        };
+        try (InputStream inputStream = LoadRustBinary.class.getResourceAsStream("/" + binaryName)) {
+            if (inputStream == null) {
+                throw new RuntimeException("Resource not found: /" + binaryName);
+            }
+            Path workingDir = getWorkingDir();
+            Path destinationPath = workingDir.resolve(binaryName);
+            if (Files.notExists(destinationPath)) {
+                Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        testRust();
+    }
+
+    private Path getWorkingDir() {
+        return Paths.get("").toAbsolutePath();
+    }
+
+    private void testRust() {
+        try {
+            float x = lib_h.sin_float(3.14F);
+            System.out.println("Expected: ~0; Result: " + x);
+        } catch (Exception e) {
+            System.err.println("Failed to load Rust: " + e);
+        }
+    }
+}

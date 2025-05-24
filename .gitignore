@@ -11,3 +11,5 @@
 /.gradle
 /.vs
 /run
+
+.qodo
