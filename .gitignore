@@ -13,3 +13,7 @@
 /run
 
 .qodo
+.jextract_path_cache
+lib.h
+/src/main/java/com/github/tatercertified/rust
+*.dll

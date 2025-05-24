@@ -22,9 +22,19 @@ declare -a extensions=(".so"
                        ".dylib")
 
 jextract_path=""
+script_dir="$(dirname "$0")"
+cache_file="$script_dir/.jextract_path_cache"
+
+function validate_jextract_path() {
+    if [ -x "$1" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
 
 function jextract() {
-    "\"${jextract_path}\"" --include-dir / --output src/main/java --target-package com.github.tatercertified.rust --library oxidizium lib.h
+    $jextract_path --include-dir / --output src/main/java --target-package com.github.tatercertified.rust --library oxidizium lib.h
     sed -i 's/Linker.Option.critical(false)/Linker.Option.critical(true)/' src/main/java/com/github/tatercertified/rust/lib_h.java
 }
 
@@ -39,10 +49,35 @@ function move_binary() {
   fi
 }
 
+# Begin Program
 echo "Make sure Docker and Jextract (Java 22) are installed"
-echo "Jextract Path:"
-read -r jextract_path
-echo "Compile for Release? (Y/N)"
+
+if [ -f "$cache_file" ]
+    then
+    cached_path=$(cat "$cache_file")
+    if validate_jextract_path "$cached_path"
+    then
+        jextract_path="$cached_path"
+    else
+        echo "Cached jextract path is invalid."
+    fi
+fi
+
+while [ -z "$jextract_path" ]
+    do
+    echo "Jextract Path:"
+    read -r jextract_path
+    # Validate the entered path
+    if validate_jextract_path "$jextract_path"
+    then
+        echo "$jextract_path" > "$cache_file"
+    else
+        echo "Invalid jextract path. Please ensure the path is correct and try again."
+        jextract_path=""
+    fi
+done
+
+echo "Compile for Mod Release? (Y/N)"
 read -r input
 
 if [ "$input" == "Y" ]
@@ -58,7 +93,7 @@ then
     move_binary i
   done
 else
-  cargo build
+  cargo build -r
   jextract
   move_binary 2
 fi
