@@ -25,7 +25,10 @@ jextract_path=""
 script_dir="$(dirname "$0")"
 cache_file="$script_dir/.jextract_path_cache"
 
-function validate_jextract_path() {
+jdk_path=""
+jdk_cache_file="$script_dir/.jdk_path_cache"
+
+function validate_path() {
     if [ -x "$1" ]; then
         return 0
     else
@@ -50,12 +53,12 @@ function move_binary() {
 }
 
 # Begin Program
-echo "Make sure Docker and Jextract (Java 22) are installed"
+echo "Make sure Docker, Jextract, and JDK 22 are installed"
 
 if [ -f "$cache_file" ]
     then
     cached_path=$(cat "$cache_file")
-    if validate_jextract_path "$cached_path"
+    if validate_path "$cached_path"
     then
         jextract_path="$cached_path"
     else
@@ -68,12 +71,37 @@ while [ -z "$jextract_path" ]
     echo "Jextract Path:"
     read -r jextract_path
     # Validate the entered path
-    if validate_jextract_path "$jextract_path"
+    if validate_path "$jextract_path"
     then
         echo "$jextract_path" > "$cache_file"
     else
         echo "Invalid jextract path. Please ensure the path is correct and try again."
         jextract_path=""
+    fi
+done
+
+if [ -f "$jdk_cache_file" ]
+    then
+    cached_path=$(cat "$jdk_cache_file")
+    if validate_path "$cached_path"
+    then
+        jdk_path="$cached_path"
+    else
+        echo "Cached JDK path is invalid."
+    fi
+fi
+
+while [ -z "$jdk_path" ]
+    do
+    echo "JDK 22 Path:"
+    read -r jdk_path
+    # Validate the entered path
+    if validate_path "$jdk_path"
+    then
+        echo "$jdk_path" > "$jdk_cache_file"
+    else
+        echo "Invalid JDK path. Please ensure the path is correct and try again."
+        jdk_path=""
     fi
 done
 
@@ -98,4 +126,4 @@ else
   move_binary 2
 fi
 
-./gradlew build --no-daemon
+env JAVA_HOME="$jdk_path" ./gradlew build --no-daemon
