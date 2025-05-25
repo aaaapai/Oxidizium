@@ -15,8 +15,8 @@ jobs:
       run: cargo build -r
     - name: Rename
       run: mv target/x86_64-unknown-linux-gnu/release/liboxidizium.so liboxidizium_linux_x64.so
-    - uses: actions/upload-artifact@v4
     - name: Upload
+      uses: actions/upload-artifact@v4
       with:
         name: liboxidizium_linux_x64
         path: liboxidizium_linux_x64.so
@@ -34,8 +34,8 @@ jobs:
       run: cargo build -r
     - name: Rename
       run: mv target/aarch64-unknown-linux-gnu/release/liboxidizium.so liboxidizium_linux_arm64.so
-    - uses: actions/upload-artifact@v4
     - name: Upload
+      uses: actions/upload-artifact@v4
       with:
         name: liboxidizium_linux_arm64
         path: liboxidizium_linux_arm64.so
@@ -48,8 +48,8 @@ jobs:
       run: cargo build -r
     - name: Rename
       run: mv target/x86_64-pc-windows-msvc/release/oxidizium.dll oxidizium_windows_x86.dll
-    - uses: actions/upload-artifact@v4
     - name: Upload
+      uses: actions/upload-artifact@v4
       with:
         name: oxidizium_windows_x86
         path: oxidizium_windows_x86.dll
@@ -62,8 +62,8 @@ jobs:
       run: cargo build -r
     - name: Rename
       run: mv target/aarch64-pc-windows-msvc/release/oxidizium.dll oxidizium_windows_arm64.dll
-    - uses: actions/upload-artifact@v4
     - name: Upload
+      uses: actions/upload-artifact@v4
       with:
         name: oxidizium_windows_arm64
         path: oxidizium_windows_arm64.dll
@@ -76,8 +76,8 @@ jobs:
       run: cargo build -r
     - name: Rename
       run: mv target/x86_64-apple-darwin/release/liboxidizium.dylib liboxidizium_mac_x86.dylib
-    - uses: actions/upload-artifact@v4
     - name: Upload
+      uses: actions/upload-artifact@v4
       with:
         name: liboxidizium_mac_x86
         path: liboxidizium_mac_x86.dylib
@@ -90,8 +90,8 @@ jobs:
       run: cargo build -r
     - name: Rename
       run: mv target/aarch64-apple-darwin/release/liboxidizium.dylib liboxidizium_mac_arm64.dylib
-    - uses: actions/upload-artifact@v4
     - name: Upload
+      uses: actions/upload-artifact@v4
       with:
         name: liboxidizium_mac_arm64
         path: liboxidizium_mac_arm64.dylib
@@ -100,8 +100,9 @@ jobs:
     needs: [rust_linux_x86, rust_linux_arm, rust_windows_x86, rust_windows_arm, rust_macos_x86, rust_macos_arm]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v4
+    - uses: actions/checkout@v4
     - name: Download Rust binaries
+      uses: actions/download-artifact@v4
     - name: Download Jextract
       run: |
         wget https://download.java.net/java/early_access/jextract/22/6/openjdk-22-jextract+6-47_linux-x64_bin.tar.gz
@@ -120,8 +121,8 @@ jobs:
         mv liboxidizium_linux_x86.so src/main/resources/liboxidizium_linux_x86.so
         mv oxidizium_windows_arm64.dll src/main/resources/oxidizium_windows_arm64.dll
         mv oxidizium_windows_x86.dll src/main/resources/oxidizium_windows_x86.dll
-    - uses: geekyeggo/delete-artifact@v5
     - name: Remove Binaries
+      uses: geekyeggo/delete-artifact@v5
       with:
         name: |
           liboxidizium_mac_arm64.dylib
