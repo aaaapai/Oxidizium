@@ -144,7 +144,7 @@ jobs:
     - name: Make Gradlew Executable
       run: chmod +x gradlew
     - name: Validate the Gradle Wrapper
-      uses: gradle/wrapper-validation-action@v1
+      uses: gradle/wrapper-validation-action@v4
     - name: Setup JDK
       uses: actions/setup-java@v4
       with:
