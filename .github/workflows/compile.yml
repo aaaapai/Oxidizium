@@ -14,7 +14,7 @@ jobs:
     - name: Build x86
       run: cargo build -r
     - name: Rename
-      run: mv target/x86_64-unknown-linux-gnu/release/liboxidizium.so liboxidizium_linux_x64.so
+      run: mv target/release/liboxidizium.so liboxidizium_linux_x64.so
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -33,7 +33,7 @@ jobs:
     - name: Build arm
       run: cargo build -r
     - name: Rename
-      run: mv target/aarch64-unknown-linux-gnu/release/liboxidizium.so liboxidizium_linux_arm64.so
+      run: mv target/release/liboxidizium.so liboxidizium_linux_arm64.so
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -47,7 +47,7 @@ jobs:
     - name: Build x86
       run: cargo build -r
     - name: Rename
-      run: mv target/x86_64-pc-windows-msvc/release/oxidizium.dll oxidizium_windows_x86.dll
+      run: mv target/release/oxidizium.dll oxidizium_windows_x86.dll
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -61,7 +61,7 @@ jobs:
     - name: Build arm
       run: cargo build -r
     - name: Rename
-      run: mv target/aarch64-pc-windows-msvc/release/oxidizium.dll oxidizium_windows_arm64.dll
+      run: mv target/release/oxidizium.dll oxidizium_windows_arm64.dll
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -75,7 +75,7 @@ jobs:
     - name: Build x86
       run: cargo build -r
     - name: Rename
-      run: mv target/x86_64-apple-darwin/release/liboxidizium.dylib liboxidizium_mac_x86.dylib
+      run: mv target/release/liboxidizium.dylib liboxidizium_mac_x86.dylib
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -89,7 +89,7 @@ jobs:
     - name: Build arm
       run: cargo build -r
     - name: Rename
-      run: mv target/aarch64-apple-darwin/release/liboxidizium.dylib liboxidizium_mac_arm64.dylib
+      run: mv target/release/liboxidizium.dylib liboxidizium_mac_arm64.dylib
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
