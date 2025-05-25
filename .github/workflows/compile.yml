@@ -18,7 +18,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        name: liboxidizium_linux_x64
+        name: liboxidizium_linux_x64.so
         path: liboxidizium_linux_x64.so
     - name: Upload C Header File
       uses: actions/upload-artifact@v4
@@ -37,7 +37,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        name: liboxidizium_linux_arm64
+        name: liboxidizium_linux_arm64.so
         path: liboxidizium_linux_arm64.so
 
   rust_windows_x86:
@@ -51,7 +51,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        name: oxidizium_windows_x86
+        name: oxidizium_windows_x86.dll
         path: oxidizium_windows_x86.dll
 
   rust_windows_arm:
@@ -66,7 +66,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        name: oxidizium_windows_arm64
+        name: oxidizium_windows_arm64.dll
         path: oxidizium_windows_arm64.dll
 
   rust_macos_x86:
@@ -80,7 +80,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        name: liboxidizium_mac_x86
+        name: liboxidizium_mac_x86.dylib
         path: liboxidizium_mac_x86.dylib
 
   rust_macos_arm:
@@ -94,7 +94,7 @@ jobs:
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        name: liboxidizium_mac_arm64
+        name: liboxidizium_mac_arm64.dylib
         path: liboxidizium_mac_arm64.dylib
 
   java:
@@ -117,7 +117,7 @@ jobs:
         tar -xvzf jextract.tar.gz
     - name: Jextract
       run: |
-        jextract-22/bin/jextract --include-dir / --output src/main/java --target-package com.github.tatercertified.rust --library oxidizium lib.h
+        jextract-22/bin/jextract --include-dir / --output src/main/java --target-package com.github.tatercertified.rust --library oxidizium /home/runner/work/Oxidizium/Oxidizium/lib.h
         sed -i 's/Linker.Option.critical(false)/Linker.Option.critical(true)/' src/main/java/com/github/tatercertified/rust/lib_h.java
         sed -i 's/public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);/public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(true));/' src/main/java/com/github/tatercertified/rust/lib_h.java
     - name: Move Binaries
