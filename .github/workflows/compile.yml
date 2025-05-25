@@ -108,6 +108,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         path: /home/runner/work/Oxidizium/Oxidizium
+        merge-multiple: true
     - name: List Files
       run: ls -a
     - name: Download Jextract
@@ -117,7 +118,7 @@ jobs:
         tar -xvzf jextract.tar.gz
     - name: Jextract
       run: |
-        jextract-22/bin/jextract --include-dir / --output src/main/java --target-package com.github.tatercertified.rust --library oxidizium /home/runner/work/Oxidizium/Oxidizium/lib.h
+        jextract-22/bin/jextract --include-dir / --output src/main/java --target-package com.github.tatercertified.rust --library oxidizium lib.h
         sed -i 's/Linker.Option.critical(false)/Linker.Option.critical(true)/' src/main/java/com/github/tatercertified/rust/lib_h.java
         sed -i 's/public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);/public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(true));/' src/main/java/com/github/tatercertified/rust/lib_h.java
     - name: Move Binaries
