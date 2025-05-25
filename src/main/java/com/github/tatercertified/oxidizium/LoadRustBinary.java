@@ -1,6 +1,5 @@
 package com.github.tatercertified.oxidizium;
 
-import com.github.tatercertified.rust.lib_h;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -56,19 +55,9 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        testRust();
     }
 
     private Path getWorkingDir() {
         return Paths.get("").toAbsolutePath();
-    }
-
-    private void testRust() {
-        try {
-            float x = lib_h.sin_float(3.14F);
-            System.out.println("Expected: ~0; Result: " + x);
-        } catch (Exception e) {
-            System.err.println("Failed to load Rust: " + e);
-        }
     }
 }

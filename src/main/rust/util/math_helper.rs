@@ -2,18 +2,21 @@ use once_cell::sync::Lazy;
 use std::num::Wrapping;
 
 const APPROXIMATION_THRESHOLD: f32 = 1.0E-5;
-const PACKED_DEGREES_CONSTANT: f32 = 360.0 / 256.0;
-const UNPACKED_DEGREES_CONSTANT: f32 = 256.0 / 360.0;
 const MULTIPLY_DE_BRUIJN_BIT_POS: [i32; 32] = [
     0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
 ];
 const ROUNDER_256THS: f64 = f64::from_bits(4805340802404319232);
-const DOUBLE_PI: f32 = std::f32::consts::PI * 2.0;
+const DOUBLE_PI: f64 = std::f64::consts::PI * 2.0_f64;
+const DOUBLE_PI_F32: f32 = std::f32::consts::PI * 2.0_f32;
+const INVERSE_SQRT: u64 = 6910469410427058090;
+const PACK: f32 = 256.0_f32 / 360.0_f32;
+const UNPACK: f32 = 360.0_f32 / 256.0_f32;
 
+// TODO Implement optimized Lithium version https://github.com/CaffeineMC/lithium/blob/develop/common/src/main/java/net/caffeinemc/mods/lithium/common/util/math/CompactSineLUT.java
 static SINE_TABLE: Lazy<[f32; 65536]> = Lazy::new(|| {
     let mut table = [0.0_f32; 65536];
     for i in 0..65536 {
-        table[i] = (i as f32 * DOUBLE_PI / 65536.0_f32).sin();
+        table[i] = (i as f64 * DOUBLE_PI / 65536.0_f64).sin() as f32;
     }
     table
 });
@@ -98,25 +101,25 @@ pub extern "C" fn ceil_double(x: f64) -> i32 {
     x.ceil() as i32
 }
 
-/// Limits the input x between a minimum and maximium value
+/// Limits the input x between a minimum and maximum value
 #[no_mangle]
 pub extern "C" fn clamp_int(x: i32, min: i32, max: i32) -> i32 {
     x.clamp(min, max)
 }
 
-/// Limits the input x between a minimum and maximium value
+/// Limits the input x between a minimum and maximum value
 #[no_mangle]
 pub extern "C" fn clamp_long(x: i64, min: i64, max: i64) -> i64 {
     x.clamp(min, max)
 }
 
-/// Limits the input x between a minimum and maximium value
+/// Limits the input x between a minimum and maximum value
 #[no_mangle]
 pub extern "C" fn clamp_float(x: f32, min: f32, max: f32) -> f32 {
     x.clamp(min, max)
 }
 
-/// Limits the input x between a minimum and maximium value
+/// Limits the input x between a minimum and maximum value
 #[no_mangle]
 pub extern "C" fn clamp_double(x: f64, min: f64, max: f64) -> f64 {
     x.clamp(min, max)
@@ -212,13 +215,13 @@ pub extern "C" fn is_multiple_of(a: i32, b: i32) -> bool {
 /// Compacts degrees into a single byte
 #[no_mangle]
 pub extern "C" fn pack_degrees(degrees: f32) -> i8 {
-    (degrees * PACKED_DEGREES_CONSTANT).floor() as i8
+    (degrees * PACK).floor() as i8
 }
 
 /// Converts bytes to degrees
 #[no_mangle]
 pub extern "C" fn unpack_degrees(packed_degrees: i8) -> f32 {
-    packed_degrees as f32 * UNPACKED_DEGREES_CONSTANT
+    packed_degrees as f32 * UNPACK
 }
 
 /// Forces degrees into +/- 180
@@ -236,13 +239,27 @@ pub extern "C" fn wrap_degrees_long(degrees: i64) -> f32 {
 /// Forces degrees into +/- 180
 #[no_mangle]
 pub extern "C" fn wrap_degrees_float(degrees: f32) -> f32 {
-    ((degrees % 360.0) + 540.0) % 360.0 - 180.0
+    let f: f32 = degrees % 360.0_f32;
+    if f >= 180.0_f32 {
+        f - 360.0_f32
+    } else if f < -180.0_f32 {
+        f + 360.0_f32
+    } else {
+        f
+    }
 }
 
 /// Forces degrees into +/- 180
 #[no_mangle]
 pub extern "C" fn wrap_degrees_double(degrees: f64) -> f64 {
-    ((degrees % 360.0) + 540.0) % 360.0 - 180.0
+    let f: f64 = degrees % 360.0_f64;
+    if f >= 180.0_f64 {
+        f - 360.0_f64
+    } else if f < -180.0_f64 {
+        f + 360.0_f64
+    } else {
+        f
+    }
 }
 
 /// Subtracts end from start
@@ -385,7 +402,7 @@ pub extern "C" fn atan_2(mut y: f64, mut x: f64) -> f64 {
         }
 
         // TODO Fast inverse square
-        let e: f64 = inverse_sqrt_double(d);
+        let e: f64 = fast_inverse_sqrt(d);
         x *= e;
         y *= e;
         let f: f64 = ROUNDER_256THS + y;
@@ -424,6 +441,15 @@ pub extern "C" fn inverse_sqrt_float(x: f32) -> f32 {
 #[no_mangle]
 pub extern "C" fn inverse_sqrt_double(x: f64) -> f64 {
     1.0 / x.sqrt()
+}
+
+pub fn fast_inverse_sqrt(mut x: f64) -> f64 {
+    let d: f64 = 0.5_f64 * x;
+    let mut l: u64 = x.to_bits();
+    l = INVERSE_SQRT - (l >> 1);
+    x = f64::from_bits(l);
+    x *= 1.5 - d * x * x;
+    x
 }
 
 /// Approximation of 1 / cbrt(x)
@@ -604,11 +630,11 @@ pub extern "C" fn lerp_angle_radians(delta: f32, start: f32, end: f32) -> f32 {
     let mut f: f32 = end - start;
 
     while f < -std::f32::consts::PI {
-        f += DOUBLE_PI;
+        f += DOUBLE_PI_F32;
     }
 
     while f >= std::f32::consts::PI {
-        f -= DOUBLE_PI;
+        f -= DOUBLE_PI_F32;
     }
 
     start + delta * f

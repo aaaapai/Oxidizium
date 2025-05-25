@@ -631,7 +631,7 @@ public class MathHelperMixin {
      */
     @Overwrite
     public static float square(float n) {
-        return lib_h.sqrt_float(n);
+        return lib_h.square_float(n);
     }
 
     /**
