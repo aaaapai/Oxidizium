@@ -107,7 +107,9 @@ jobs:
     - name: Download Rust binaries
       uses: actions/download-artifact@v4
       with:
-        path: /
+        path: /home/runner/work/Oxidizium/Oxidizium
+    - name: List Files
+      run: ls -a
     - name: Download Jextract
       run: |
         wget https://download.java.net/java/early_access/jextract/22/6/openjdk-22-jextract+6-47_linux-x64_bin.tar.gz
