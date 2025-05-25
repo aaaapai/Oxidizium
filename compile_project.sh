@@ -7,11 +7,11 @@ declare -a targets=("x86_64-unknown-linux-gnu"
                     "x86_64-apple-darwin"
                     "aarch64-apple-darwin")
 
-declare -a filenames=("liboxidizium_linux_x64"
+declare -a filenames=("liboxidizium_linux_x86"
                       "liboxidizium_linux_arm64"
-                      "oxidizium_windows_x64"
+                      "oxidizium_windows_x86"
                       "oxidizium_windows_arm64"
-                      "liboxidizium_mac_x64"
+                      "liboxidizium_mac_x86"
                       "liboxidizium_mac_arm64")
 
 declare -a extensions=(".so"
