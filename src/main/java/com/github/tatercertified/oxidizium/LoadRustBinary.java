@@ -18,6 +18,7 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
         String arch = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH);
 
         String binaryName;
+        String outputName;
 
         if (SystemUtils.IS_OS_WINDOWS) {
             binaryName = switch (arch) {
@@ -25,18 +26,21 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
                 case "arm", "aarch64" -> "oxidizium_windows_arm64.dll";
                 default -> throw new IllegalStateException("Unsupported architecture: " + arch);
             };
+            outputName = "oxidizium";
         } else if (SystemUtils.IS_OS_LINUX) {
             binaryName = switch (arch) {
                 case "amd64", "x86_64" -> "liboxidizium_linux_x86.so";
                 case "arm64", "aarch64" -> "liboxidizium_linux_arm64.so";
                 default -> throw new IllegalStateException("Unsupported architecture: " + arch);
             };
+            outputName = "liboxidizium";
         } else if (SystemUtils.IS_OS_MAC) {
             binaryName = switch (arch) {
                 case "x86_64" -> "liboxidizium_mac_x86.dylib";
                 case "arm64", "aarch64" -> "liboxidizium_mac_arm64.dylib";
                 default -> throw new IllegalStateException("Unsupported architecture: " + arch);
             };
+            outputName = "liboxidizium";
         } else {
             throw new IllegalStateException("Unsupported OS: " + osName);
         }
@@ -48,7 +52,7 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
             Path workingDir = getWorkingDir();
             int lastDotIndex = binaryName.lastIndexOf('.');
             String extension = binaryName.substring(lastDotIndex + 1);
-            Path destinationPath = workingDir.resolve("oxidizium." + extension);
+            Path destinationPath = workingDir.resolve(outputName + "." + extension);
             if (Files.notExists(destinationPath)) {
                 Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
             }
