@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "plugin": "com.github.tatercertified.oxidizium.OxidiziumMixinPlugin",
   "mixins": [
+    "LinuxFixMixin",
     "MathHelperMixin"
   ],
   "client": [

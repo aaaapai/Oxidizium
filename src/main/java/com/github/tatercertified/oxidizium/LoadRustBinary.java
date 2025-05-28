@@ -61,7 +61,7 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
         }
     }
 
-    private Path getWorkingDir() {
+    public static Path getWorkingDir() {
         return Paths.get("").toAbsolutePath();
     }
 }
