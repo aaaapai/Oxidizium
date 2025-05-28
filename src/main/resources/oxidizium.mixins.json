@@ -6,8 +6,7 @@
   "plugin": "com.github.tatercertified.oxidizium.OxidiziumMixinPlugin",
   "mixins": [
     "LinuxFixMixin",
-    "MathHelperMixin",
-    "NativePerformanceMixin"
+    "MathHelperMixin"
   ],
   "client": [
   ],
