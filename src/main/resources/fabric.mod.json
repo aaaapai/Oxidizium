@@ -7,7 +7,7 @@
   "authors": [],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/iron_oxide/icon.png",
+  "icon": "assets/oxidizium/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
