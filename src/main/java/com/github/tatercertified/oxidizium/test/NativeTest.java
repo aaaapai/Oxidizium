@@ -1,46 +1,72 @@
 package com.github.tatercertified.oxidizium.test;
 
 import com.github.tatercertified.oxidizium.Oxidizium;
-import com.github.tatercertified.oxidizium.mixin.MathHelperMixin;
+import com.github.tatercertified.oxidizium.utils.MixinCloner;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class NativeMathTest {
-    public static boolean testsFailed;
+public class NativeTest {
     private static final float FLOAT_TOLERANCE = 0.0001F;
     private static final double DOUBLE_TOLERANCE = 0.0000001;
 
-    public static void testNativeMath() {
-        Class<?> mathHelperMixin = MathHelperMixin.class;
-        Class<?> mathHelperClass = MathHelper.class;
+    public static void invokeTests() {
+        testFramework("com/github/tatercertified/oxidizium/mixin/MathHelperMixin", "Native Math", MathHelper.class, 50, float.class, double.class, int.class, long.class, byte.class);
+        testFramework("com/github/tatercertified/oxidizium/mixin/compat/LithiumMathHelperMixin", "Native Math Lithium Compat", MathHelper.class, 50, float.class, double.class, int.class, long.class, byte.class);
+    }
 
-        for (Method method : mathHelperMixin.getDeclaredMethods()) {
-            try {
-                Method mathHelperMethod = mathHelperClass.getMethod(method.getName(), method.getParameterTypes());
-                if (method.getReturnType().equals(float.class)
-                        || method.getReturnType().equals(double.class)
-                        || method.getReturnType().equals(int.class)
-                        || method.getReturnType().equals(long.class)
-                        || method.getReturnType().equals(byte.class)) {
-                    Oxidizium.TEST_LOGGER.info("Testing {} ({})}", method.getName(), method.getParameterTypes());
-                    try {
-                        invokeAndTest(method, mathHelperMethod);
-                    } catch (Exception e) {
-                        Oxidizium.TEST_LOGGER.error("Error Thrown");
-                        Oxidizium.TEST_LOGGER.warn(e.toString());
-                        testsFailed = true;
+    /**
+     * Tests parity between a native Mixin and the original Java class
+     * @param mixinPath Path to the Mixin; Ex: <b>"com/github/tatercertified/oxidizium/mixin/compat/LithiumMathHelperMixin"</b>
+     * @param testName Name of the test
+     * @param vanillaClass Vanilla class instance
+     * @param runs Number of times to run the test
+     * @param returnFilter A filter for return types of tested methods. Null for no filter
+     */
+    private static void testFramework(String mixinPath, String testName, Class<?> vanillaClass, int runs, @Nullable Class<?>... returnFilter) {
+        String mixinName = mixinPath.substring(mixinPath.lastIndexOf('/') + 1);
+        String clone = "com/github/tatercertified/oxidizium/Cloned" + mixinName;
+        Class<?> mixin;
+        try {
+            mixin = MixinCloner.cloneStaticMethods(mixinPath, clone);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        boolean testsFailed = false;
+        Oxidizium.TEST_LOGGER.info("Starting {} Test", testName);
+        for (int i = 0; i < runs; i++) {
+            for (Method method : mixin.getDeclaredMethods()) {
+                try {
+                    Method mathHelperMethod = vanillaClass.getMethod(method.getName(), method.getParameterTypes());
+                    if (returnFilter == null || Arrays.stream(returnFilter).anyMatch(clazz -> clazz == method.getReturnType())) {
+                        try {
+                            testsFailed = !invokeAndTest(method, mathHelperMethod);
+                        } catch (Exception e) {
+                            Oxidizium.TEST_LOGGER.info("\u001B[31m {} ({}) Has Errored \u001B[0m", method.getName(), method.getParameterTypes());
+                            Oxidizium.TEST_LOGGER.warn(e.toString());
+                            testsFailed = true;
+                        }
                     }
+                } catch (NoSuchMethodException _) {
                 }
-            } catch (NoSuchMethodException e) {
-                Oxidizium.TEST_LOGGER.warn("Method {} does not exist in MathHelper", method.getName());
             }
+            if (testsFailed) {
+                break;
+            }
+        }
+        if (testsFailed) {
+            Oxidizium.TEST_LOGGER.info("\u001B[31m {} Test Has Failed \u001B[0m", testName);
+        } else {
+            Oxidizium.TEST_LOGGER.info("{} Test Has Passed", testName);
         }
     }
 
-    private static void invokeAndTest(Method nativeMethod, Method javaMethod) throws Exception {
+    private static boolean invokeAndTest(Method nativeMethod, Method javaMethod) throws Exception {
         Class<?>[] parameterTypes = nativeMethod.getParameterTypes();
         Object[] args = new Object[parameterTypes.length];
 
@@ -56,8 +82,8 @@ public class NativeMathTest {
 
         boolean resultsEqual = areResultsEquivalent(nativeResult, javaResult, nativeMethod.getReturnType());
 
-        assertTrue(resultsEqual,
-                String.format("%s is invalid: %s != %s", nativeMethod.getName(), nativeResult, javaResult));
+        return assertTrue(resultsEqual,
+                String.format("\u001B[31m %s is invalid: %s != %s \u001B[0m", nativeMethod.getName(), nativeResult, javaResult));
     }
 
     private static boolean areResultsEquivalent(Object nativeResult, Object javaResult, Class<?> returnType) {
@@ -126,10 +152,10 @@ public class NativeMathTest {
         };
     }
 
-    private static void assertTrue(boolean bool, String ifFailed) {
+    private static boolean assertTrue(boolean bool, String ifFailed) {
         if (!bool) {
-            testsFailed = true;
             Oxidizium.TEST_LOGGER.error(ifFailed);
         }
+        return bool;
     }
 }

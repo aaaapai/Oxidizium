@@ -3,7 +3,8 @@ use std::num::Wrapping;
 
 const APPROXIMATION_THRESHOLD: f32 = 1.0E-5;
 const MULTIPLY_DE_BRUIJN_BIT_POS: [i32; 32] = [
-    0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+    0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26,
+    12, 18, 6, 11, 5, 10, 9,
 ];
 const ROUNDER_256THS: f64 = f64::from_bits(4805340802404319232);
 const DOUBLE_PI: f64 = std::f64::consts::PI * 2.0_f64;
@@ -12,29 +13,40 @@ const INVERSE_SQRT: u64 = 6910469410427058090;
 const PACK: f32 = 256.0_f32 / 360.0_f32;
 const UNPACK: f32 = 360.0_f32 / 256.0_f32;
 
-// TODO Implement optimized Lithium version https://github.com/CaffeineMC/lithium/blob/develop/common/src/main/java/net/caffeinemc/mods/lithium/common/util/math/CompactSineLUT.java
 static SINE_TABLE: Lazy<[f32; 65536]> = Lazy::new(|| {
     let mut table = [0.0_f32; 65536];
-    for i in 0..65536 {
-        table[i] = (i as f64 * DOUBLE_PI / 65536.0_f64).sin() as f32;
+    for (i, value) in table.iter_mut().enumerate() {
+        *value = (i as f64 * DOUBLE_PI / 65536.0).sin() as f32;
     }
     table
 });
 
+// From Lithium https://github.com/CaffeineMC/lithium/blob/develop/common/src/main/java/net/caffeinemc/mods/lithium/common/util/math/CompactSineLUT.java
+static SINE_TABLE_OPT: Lazy<[u32; 16385]> = Lazy::new(|| {
+    let mut table = [0u32; 16385];
+    for (i, value) in table.iter_mut().enumerate() {
+        *value = (SINE_TABLE[i]).to_bits();
+    }
+    table
+});
+
+// From Lithium https://github.com/CaffeineMC/lithium/blob/develop/common/src/main/java/net/caffeinemc/mods/lithium/common/util/math/CompactSineLUT.java
+static SINE_TABLE_MIDPOINT_OPT: Lazy<f32> = Lazy::new(|| SINE_TABLE[SINE_TABLE.len() / 2_usize]);
+
 static ARCSIN_TABLE: Lazy<[f64; 257]> = Lazy::new(|| {
     let mut table = [0.0; 257];
-    for i in 0..257 {
+    for (i, value) in table.iter_mut().enumerate() {
         let d = i as f64 / 256.0;
-        table[i] = d.asin();
+        *value = d.asin();
     }
     table
 });
 
 static COSIN_OF_ARCSIN_TABLE: Lazy<[f64; 257]> = Lazy::new(|| {
     let mut table = [0.0; 257];
-    for i in 0..257 {
+    for (i, value) in table.iter_mut().enumerate() {
         let d = i as f64 / 256.0;
-        table[i] = d.asin().cos();
+        *value = d.asin().cos();
     }
     table
 });
@@ -42,15 +54,39 @@ static COSIN_OF_ARCSIN_TABLE: Lazy<[f64; 257]> = Lazy::new(|| {
 /// Computes the sine of an input, x, in radians
 #[no_mangle]
 pub extern "C" fn sin_float(x: f32) -> f32 {
-    let sin_table = LookUpTableFloat::new(&SINE_TABLE[..]);
-    sin_table.sin(x)
+    SINE_TABLE[((x * 10430.378_f32) as i32 & 65535) as usize]
+}
+
+fn lookup(index: u32) -> f32 {
+    if index == 32768 {
+        return *SINE_TABLE_MIDPOINT_OPT;
+    }
+
+    let neg: u32 = (index & 0x8000) << 16;
+    let mask: i32 = ((index as i32) << 17) >> 31;
+    let mut pos: i32 = (0x8001 & mask) + (index as i32 ^ mask);
+    pos &= 0x7fff;
+    f32::from_bits(SINE_TABLE_OPT[pos as usize] ^ neg)
+}
+
+/// Computes the sine of an input, x, in radians
+/// Optimized version from Lithium
+#[no_mangle]
+pub extern "C" fn lithium_sin_float(x: f32) -> f32 {
+    lookup((x * 10430.378_f32) as u32 & 0xFFFF)
+}
+
+/// Computes the cosine of an input, x, in radians
+/// Optimized version from Lithium
+#[no_mangle]
+pub extern "C" fn lithium_cos_float(x: f32) -> f32 {
+    lookup((x * 10430.378_f32 + 16384.0_f32) as u32 & 0xFFFF)
 }
 
 /// Computes the cosine of an input, x, in radians
 #[no_mangle]
 pub extern "C" fn cos_float(x: f32) -> f32 {
-    let cos_table = LookUpTableFloat::new(&SINE_TABLE[..]);
-    cos_table.cos(x)
+    SINE_TABLE[((x * 10430.378_f32 + 16384.0_f32) as i32 & 65535) as usize]
 }
 
 /// Square roots the input x
@@ -270,7 +306,7 @@ pub extern "C" fn subtract_angles(start: f32, end: f32) -> f32 {
 
 /// Absolute value of second - first
 #[no_mangle]
-pub extern "C" fn angle_between (first: f32, second: f32) -> f32 {
+pub extern "C" fn angle_between(first: f32, second: f32) -> f32 {
     subtract_angles(first, second).abs()
 }
 
@@ -338,7 +374,7 @@ pub extern "C" fn ceil_log_2(mut value: i32) -> i32 {
 /// Takes the floor of log2(value) using the de Bruijn sequence
 #[no_mangle]
 pub extern "C" fn floor_log_2(value: i32) -> i32 {
-    ceil_log_2(value) - if is_power_of_two(value) {0} else {1}
+    ceil_log_2(value) - if is_power_of_two(value) { 0 } else { 1 }
 }
 
 /// Gets the fractional part of a float
@@ -407,10 +443,8 @@ pub extern "C" fn atan_2(mut y: f64, mut x: f64) -> f64 {
         y *= e;
         let f: f64 = ROUNDER_256THS + y;
         let i: i32 = f.to_bits() as i32;
-        let asin_table: LookUpTableDouble = LookUpTableDouble::new(&ARCSIN_TABLE[..]);
-        let g: f64 = asin_table.asin(i as usize);
-        let cos_table: LookUpTableDouble = LookUpTableDouble::new(&COSIN_OF_ARCSIN_TABLE[..]);
-        let h: f64 = cos_table.cos_of_asin(i as usize);
+        let g: f64 = ARCSIN_TABLE[i as usize];
+        let h: f64 = COSIN_OF_ARCSIN_TABLE[i as usize];
         let j: f64 = f - ROUNDER_256THS;
         let k: f64 = y * h - x * j;
         let l: f64 = (6.0 + k * k) * k * 0.16666666666666666;
@@ -484,7 +518,10 @@ pub extern "C" fn hsv_to_argb(hue: f32, saturation: f32, value: f32, alpha: i32)
         3 => (g, h, value),
         4 => (j, g, value),
         5 => (value, g, h),
-        _ => panic!("Something went wrong when converting from HSV to RGB. Input was {}, {}, {}", hue, saturation, value),
+        _ => panic!(
+            "Something went wrong when converting from HSV to RGB. Input was {}, {}, {}",
+            hue, saturation, value
+        ),
     };
 
     let r = (k * 255.0).clamp(0.0, 255.0) as i32;
@@ -562,8 +599,19 @@ pub extern "C" fn lerp_positive(delta: f32, start: i32, end: i32) -> i32 {
 
 /// Two-dimensional Linear Interpolation
 #[no_mangle]
-pub extern "C" fn lerp_2(deltax: f64, deltay: f64, x0y0: f64, x1y0: f64, x0y1: f64, x1y1: f64) -> f64 {
-    lerp_double(deltay, lerp_double(deltax, x0y0, x1y0), lerp_double(deltax, x0y1, x1y1))
+pub extern "C" fn lerp_2(
+    deltax: f64,
+    deltay: f64,
+    x0y0: f64,
+    x1y0: f64,
+    x0y1: f64,
+    x1y1: f64,
+) -> f64 {
+    lerp_double(
+        deltay,
+        lerp_double(deltax, x0y0, x1y0),
+        lerp_double(deltax, x0y1, x1y1),
+    )
 }
 
 /// Three-dimensional Linear Interpolation
@@ -579,15 +627,22 @@ pub extern "C" fn lerp_3(
     x0y0z1: f64,
     x1y0z1: f64,
     x0y1z1: f64,
-    x1y1z1: f64
+    x1y1z1: f64,
 ) -> f64 {
-    lerp_double(delta_z, lerp_2(delta_x, delta_y, x0y0z0, x1y0z0, x0y1z0, x1y1z0), lerp_2(delta_x, delta_y, x0y0z1, x1y0z1, x0y1z1, x1y1z1))
+    lerp_double(
+        delta_z,
+        lerp_2(delta_x, delta_y, x0y0z0, x1y0z0, x0y1z0, x1y1z0),
+        lerp_2(delta_x, delta_y, x0y0z1, x1y0z1, x0y1z1, x1y1z1),
+    )
 }
 
 /// Interpolates a point on the Catmull-Rom Spline
 #[no_mangle]
 pub extern "C" fn catmull_rom(delta: f32, p0: f32, p1: f32, p2: f32, p3: f32) -> f32 {
-    0.5 * (2.0 * p1 + (p2 - p0) * delta + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * delta * delta + (3.0 * p1 - p0 - 3.0 * p2 + p3) * delta * delta * delta)
+    0.5 * (2.0 * p1
+        + (p2 - p0) * delta
+        + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * delta * delta
+        + (3.0 * p1 - p0 - 3.0 * p2 + p3) * delta * delta * delta)
 }
 
 /// Fades a value using Perlin
@@ -643,7 +698,8 @@ pub extern "C" fn lerp_angle_radians(delta: f32, start: f32, end: f32) -> f32 {
 /// Wraps a number around after it hits the max deviation
 #[no_mangle]
 pub extern "C" fn wrap(value: f32, max_deviation: f32) -> f32 {
-    ((value % max_deviation - max_deviation * 0.5).abs() - max_deviation * 0.25) / (max_deviation * 0.25)
+    ((value % max_deviation - max_deviation * 0.5).abs() - max_deviation * 0.25)
+        / (max_deviation * 0.25)
 }
 
 /// Squares a value
@@ -672,26 +728,66 @@ pub extern "C" fn square_long(value: i64) -> i64 {
 
 /// Linearly maps a value from one number range to another and clamps the result
 #[no_mangle]
-pub extern "C" fn clamped_map_double(value: f64, old_start: f64, old_end: f64, new_start: f64, new_end: f64) -> f64 {
-    clamp_lerp_double(new_start, new_end, get_lerp_progress_double(value, old_start, old_end))
+pub extern "C" fn clamped_map_double(
+    value: f64,
+    old_start: f64,
+    old_end: f64,
+    new_start: f64,
+    new_end: f64,
+) -> f64 {
+    clamp_lerp_double(
+        new_start,
+        new_end,
+        get_lerp_progress_double(value, old_start, old_end),
+    )
 }
 
 /// Linearly maps a value from one number range to another and clamps the result
 #[no_mangle]
-pub extern "C" fn clamped_map_float(value: f32, old_start: f32, old_end: f32, new_start: f32, new_end: f32) -> f32 {
-    clamp_lerp_float(new_start, new_end, get_lerp_progress_float(value, old_start, old_end))
+pub extern "C" fn clamped_map_float(
+    value: f32,
+    old_start: f32,
+    old_end: f32,
+    new_start: f32,
+    new_end: f32,
+) -> f32 {
+    clamp_lerp_float(
+        new_start,
+        new_end,
+        get_lerp_progress_float(value, old_start, old_end),
+    )
 }
 
 /// Linearly maps a value from one number range to another, unclamped
 #[no_mangle]
-pub extern "C" fn map_double(value: f64, old_start: f64, old_end: f64, new_start: f64, new_end: f64) -> f64 {
-    lerp_double(get_lerp_progress_double(value, old_start, old_end), new_start, new_end)
+pub extern "C" fn map_double(
+    value: f64,
+    old_start: f64,
+    old_end: f64,
+    new_start: f64,
+    new_end: f64,
+) -> f64 {
+    lerp_double(
+        get_lerp_progress_double(value, old_start, old_end),
+        new_start,
+        new_end,
+    )
 }
 
 /// Linearly maps a value from one number range to another, unclamped
 #[no_mangle]
-pub extern "C" fn map_float(value: f32, old_start: f32, old_end: f32, new_start: f32, new_end: f32) -> f32 {
-    lerp_float(get_lerp_progress_float(value, old_start, old_end), new_start, new_end)
+pub extern "C" fn map_float(
+    value: f32,
+    old_start: f32,
+    old_end: f32,
+    new_start: f32,
+    new_end: f32,
+) -> f32 {
+    lerp_float(
+        get_lerp_progress_float(value, old_start, old_end),
+        new_start,
+        new_end,
+    )
 }
 
 // method_34957
@@ -762,43 +858,12 @@ pub extern "C" fn round_down_to_multiple(a: f64, b: i32) -> i32 {
 /// Gradual sine function
 #[no_mangle]
 pub extern "C" fn ease_in_out_sine(value: f32) -> f32 {
-    let cos_table = LookUpTableFloat::new(&SINE_TABLE[..]);
-    -(cos_table.cos(std::f32::consts::PI * value) - 1.0) / 2.0
+    -(cos_float(std::f32::consts::PI * value) - 1.0_f32) / 2.0_f32
 }
 
-struct LookUpTableDouble<'a> {
-    table: &'a [f64],
+/// Gradual sine function
+/// Compatible with Lithium optimized SineLUT
+#[no_mangle]
+pub extern "C" fn lithium_ease_in_out_sine(value: f32) -> f32 {
+    -(lithium_cos_float(std::f32::consts::PI * value) - 1.0_f32) / 2.0_f32
 }
-
-impl<'a> LookUpTableDouble<'a> {
-    pub fn new(table: &'a [f64]) -> Self {
-        LookUpTableDouble { table }
-    }
-
-    pub fn asin(&self, i: usize) -> f64 {
-        self.table[i]
-    }
-
-    pub fn cos_of_asin(&self, i: usize) -> f64 {
-        self.table[i]
-    }
-}
-
-struct LookUpTableFloat<'a> {
-    table: &'a [f32],
-}
-
-impl<'a> LookUpTableFloat<'a> {
-    pub fn new(table: &'a [f32]) -> Self {
-        LookUpTableFloat { table }
-    }
-
-    pub fn sin(&self, rad: f32) -> f32 {
-        self.table[((rad * 10430.378_f32) as i32 & 65535) as usize]
-    }
-
-    pub fn cos(&self, rad: f32) -> f32 {
-        self.table[((rad * 10430.378_f32 + 16384.0_f32) as i32 & 65535) as usize]
-    }
-}
-

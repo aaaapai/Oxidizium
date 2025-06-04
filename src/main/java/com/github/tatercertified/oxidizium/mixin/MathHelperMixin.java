@@ -1,7 +1,9 @@
 package com.github.tatercertified.oxidizium.mixin;
 
 import com.github.tatercertified.rust.lib_h;
+import com.moulberry.mixinconstraints.annotations.IfModAbsent;
 import net.minecraft.util.math.MathHelper;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,13 +26,13 @@ public class MathHelperMixin {
     private static void cancelArrayFill(CallbackInfo ci) {
         ci.cancel();
     }
-    // TODO Remove ArcSineTable and CosineOfArcSineTable
 
     // Implement Rust
     /**
      * @author QPCrummer
      * @reason Implement in Rust
      */
+    @IfModAbsent("lithium")
     @Overwrite
     public static float sin(float value) {
         return lib_h.sin_float(value);
@@ -40,6 +42,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
+    @IfModAbsent("lithium")
     @Overwrite
     public static float cos(float value) {
         return lib_h.cos_float(value);
@@ -782,6 +785,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
+    @IfModAbsent("lithium")
     @Overwrite
     public static float easeInOutSine(float value) {
         return lib_h.ease_in_out_sine(value);
