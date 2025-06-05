@@ -16,6 +16,7 @@ public class OxidiziumMixinPlugin implements IMixinConfigPlugin {
     public void onLoad(String s) {
         this.mixinPackage = s;
         MixinConstraintsBootstrap.init(mixinPackage);
+        Config.init();
     }
 
     @Override
@@ -25,7 +26,7 @@ public class OxidiziumMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (Oxidizium.DEBUG_MODE) {
+        if (Config.getInstance().debug()) {
             return mixinClassName.contains("WindowMixin");
         }
         if (this.mixinPackage != null && !mixinClassName.startsWith(this.mixinPackage)) {
@@ -40,7 +41,7 @@ public class OxidiziumMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public List<String> getMixins() {
-        return Oxidizium.DEBUG_MODE ? List.of() : null;
+        return Config.getInstance().debug() ? List.of() : null;
     }
 
     @Override

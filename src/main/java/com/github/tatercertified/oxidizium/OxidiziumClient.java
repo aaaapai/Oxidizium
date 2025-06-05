@@ -9,7 +9,7 @@ import static imgui.app.Application.launch;
 public class OxidiziumClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        if (Oxidizium.DEBUG_MODE) {
+        if (Config.getInstance().debug()) {
             ClientLifecycleEvents.CLIENT_STARTED.register(_ -> launch(new TestingGUI()));
         }
     }

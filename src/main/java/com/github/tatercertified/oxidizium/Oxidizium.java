@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory;
 
 public class Oxidizium implements ModInitializer {
     public static final Logger TEST_LOGGER = LoggerFactory.getLogger("Oxidizium Native Test");
-    public static final boolean DEBUG_MODE = true;
+    public static final Logger LOGGER = LoggerFactory.getLogger("Oxidizium");
     @Override
     public void onInitialize() {
-        if (!DEBUG_MODE) {
+        if (!Config.getInstance().debug()) {
             Cleanup.cleanupClasses();
         }
     }
