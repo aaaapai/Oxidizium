@@ -190,7 +190,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static int floorDiv(int dividend, int divisor) {
+    public static int floorDiv(int dividend, @NonZero int divisor) {
         return lib_h.floor_div(dividend, divisor);
     }
 
@@ -716,7 +716,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static int ceilDiv(int a, int b) {
+    public static int ceilDiv(int a, @NonZero int b) {
         return lib_h.ceil_div(a, b);
     }
 

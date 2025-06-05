@@ -2,33 +2,44 @@ package com.github.tatercertified.oxidizium.test;
 
 import com.github.tatercertified.oxidizium.Oxidizium;
 import com.github.tatercertified.oxidizium.utils.MixinCloner;
+import imgui.type.ImInt;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class NativeTest {
     private static final float FLOAT_TOLERANCE = 0.0001F;
     private static final double DOUBLE_TOLERANCE = 0.0000001;
     private static final Deque<Runnable> TASKS = new ArrayDeque<>();
     private static int totalRuns = 0;
+    private static final AtomicReference<ImInt> RUNS_PER_TEST = new AtomicReference<>(new ImInt(50));
 
     public static void prepareTests() {
-        testFramework("com/github/tatercertified/oxidizium/mixin/MathHelperMixin", "Native Math", MathHelper.class, 50, float.class, double.class, int.class, long.class, byte.class);
-        testFramework("com/github/tatercertified/oxidizium/mixin/compat/LithiumMathHelperMixin", "Native Math Lithium Compat", MathHelper.class, 50, float.class, double.class, int.class, long.class, byte.class);
+        testFramework("com/github/tatercertified/oxidizium/mixin/MathHelperMixin", "Native Math", MathHelper.class, RUNS_PER_TEST.get().intValue(), float.class, double.class, int.class, long.class, byte.class);
+        testFramework("com/github/tatercertified/oxidizium/mixin/compat/LithiumMathHelperMixin", "Native Math Lithium Compat", MathHelper.class, RUNS_PER_TEST.get().intValue(), float.class, double.class, int.class, long.class, byte.class);
         TestingGUI.setTotalTests(totalRuns);
     }
 
     public static void invokeTests() {
+        totalRuns = 0;
+        TestingGUI.reset();
+        NativeTest.prepareTests();
         while (!TASKS.isEmpty()) {
             TASKS.poll().run();
         }
+    }
+
+    public static ImInt getRunsPerTest() {
+        return RUNS_PER_TEST.get();
     }
 
     /**
@@ -65,9 +76,13 @@ public class NativeTest {
                             try {
                                 invokeAndTest(method, vanillaMethod);
                             } catch (Exception e) {
-                                Oxidizium.TEST_LOGGER.info("\u001B[31m {} ({}) Has Errored \u001B[0m", method.getName(), method.getParameterTypes());
-                                TestingGUI.addError(formatMethod(vanillaMethod), false, e.toString());
-                                Oxidizium.TEST_LOGGER.warn(e.toString());
+                                String error;
+                                if (e instanceof InvocationTargetException exception) {
+                                    error = exception.getCause().toString();
+                                } else {
+                                    error = e.toString();
+                                }
+                                TestingGUI.addError(formatMethod(vanillaMethod), false, error);
                             }
                         }
                     } catch (NoSuchMethodException _) {
@@ -146,7 +161,6 @@ public class NativeTest {
         }
 
         if (acceptable && !exact) {
-            Oxidizium.TEST_LOGGER.warn("Precision issue detected: {} != {}", nativeResult, javaResult);
             TestingGUI.addError(formatMethod(vanillaMethod), true, nativeResult + " != " + javaResult);
         }
 

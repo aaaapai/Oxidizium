@@ -9,23 +9,29 @@ import imgui.app.Configuration;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiWindowFlags;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestingGUI extends Application {
-
     private static boolean ran;
-    private static final Set<String> FAILED_TESTS = new HashSet<>();
+    private static final HashMap<String, Set<String>> FAILED_TESTS = new HashMap<>();
     private static volatile String currentTest = "";
     private static volatile String currentClass = "";
     private static volatile String currentMethod = "";
     private static final AtomicInteger currentRun = new AtomicInteger(0);
     private static final AtomicInteger TOTAL_TESTS = new AtomicInteger(0);
     private static final AtomicInteger CURRENT_TEST_INDEX = new AtomicInteger(0);
+    private static final Semaphore SAFETY_LOCK = new Semaphore(1);
 
     public static void setCurrentTestName(String name) {
         currentTest = name;
+        accessHashMap();
+        FAILED_TESTS.put(name, new HashSet<>());
+        SAFETY_LOCK.release();
     }
 
     public static void setCurrentClass(String className) {
@@ -46,11 +52,26 @@ public class TestingGUI extends Application {
     }
 
     public static void addError(String methodName, boolean warning, String... warningInfo) {
+        accessHashMap();
         if (warning) {
-            FAILED_TESTS.add(methodName + ": " + warningInfo[0]);
+            FAILED_TESTS.get(currentTest).add(methodName + ": " + warningInfo[0]);
         } else {
-            FAILED_TESTS.add("%RED%" + methodName + ": " + warningInfo[0]);
+            FAILED_TESTS.get(currentTest).add("%RED%" + methodName + ": " + warningInfo[0]);
         }
+        SAFETY_LOCK.release();
+    }
+
+    public static void reset() {
+        // Ensure no CME
+        accessHashMap();
+        FAILED_TESTS.clear();
+        SAFETY_LOCK.release();
+        TOTAL_TESTS.set(0);
+        currentRun.set(0);
+        CURRENT_TEST_INDEX.set(0);
+        currentClass = "";
+        currentMethod = "";
+        currentTest = "";
     }
 
     @Override
@@ -64,13 +85,18 @@ public class TestingGUI extends Application {
     @Override
     protected void preRun() {
         Oxidizium.TEST_LOGGER.info("Starting Native Testing");
-        NativeTest.prepareTests();
         super.preRun();
     }
 
     @Override
     protected void initWindow(Configuration config) {
         super.initWindow(config);
+    }
+
+    @Override
+    protected void disposeWindow() {
+        super.disposeWindow();
+        System.exit(0);
     }
 
     @Override
@@ -107,18 +133,34 @@ public class TestingGUI extends Application {
         ImGui.setCursorPosY(padding * 3);
 
         ImGui.pushStyleColor(ImGuiCol.ChildBg, 0xFF2E2E2E); // dark gray background
+        ImGui.pushStyleColor(ImGuiCol.ScrollbarBg, ImColor.rgb(46, 46, 46)); // dark gray background
+        ImGui.pushStyleColor(ImGuiCol.ScrollbarGrab, ImColor.rgb(239, 121, 0)); // Ferris orange
+        ImGui.pushStyleColor(ImGuiCol.ScrollbarGrabHovered, ImColor.rgb(255, 150, 50)); // lighter orange
+        ImGui.pushStyleColor(ImGuiCol.ScrollbarGrabActive, ImColor.rgb(189, 71, 0)); // deeper orange
 
         ImGui.beginChild("LogBox", boxWidth, boxHeight, true, ImGuiWindowFlags.HorizontalScrollbar);
-        for (String line : FAILED_TESTS) {
-            if (line.contains("%RED%")) {
-                ImGui.textColored(ImColor.rgb(255, 0, 0), line.replace("%RED%", ""));
-            } else {
-                ImGui.text(line);
+        // Ensure no CME
+        accessHashMap();
+        for (Map.Entry<String, Set<String>> testFails : FAILED_TESTS.entrySet()) {
+
+            ImGui.pushStyleColor(ImGuiCol.Header, ImColor.rgb(239, 121, 0));
+            ImGui.pushStyleColor(ImGuiCol.HeaderHovered, ImColor.rgb(255, 140, 20));
+            ImGui.pushStyleColor(ImGuiCol.HeaderActive, ImColor.rgb(255, 120, 0));
+            if (!testFails.getValue().isEmpty() && ImGui.collapsingHeader(testFails.getKey())) {
+                for (String line : testFails.getValue()) {
+                    if (line.contains("%RED%")) {
+                        ImGui.textColored(ImColor.rgb(255, 0, 0), line.replace("%RED%", ""));
+                    } else {
+                        ImGui.text(line);
+                    }
+                }
             }
+            ImGui.popStyleColor(3);
         }
+        SAFETY_LOCK.release();
         ImGui.endChild();
 
-        ImGui.popStyleColor();
+        ImGui.popStyleColor(5);
 
         // ---------------- Right Box (Test Info) ----------------
 
@@ -132,6 +174,10 @@ public class TestingGUI extends Application {
         ImGui.setCursorPosY(padding * 3);
 
         ImGui.pushStyleColor(ImGuiCol.ChildBg, 0xFF2E2E2E); // same gray
+        ImGui.pushStyleColor(ImGuiCol.ScrollbarBg, ImColor.rgb(46, 46, 46)); // dark gray background
+        ImGui.pushStyleColor(ImGuiCol.ScrollbarGrab, ImColor.rgb(239, 121, 0)); // Ferris orange
+        ImGui.pushStyleColor(ImGuiCol.ScrollbarGrabHovered, ImColor.rgb(255, 150, 50)); // lighter orange
+        ImGui.pushStyleColor(ImGuiCol.ScrollbarGrabActive, ImColor.rgb(189, 71, 0)); // deeper orange
 
         ImGui.beginChild("InfoBox", boxWidth, boxHeight, true, ImGuiWindowFlags.HorizontalScrollbar);
 
@@ -146,14 +192,24 @@ public class TestingGUI extends Application {
         centerText("Method", boxWidth, true);
         multiSpace(4);
         centerText(currentMethod, boxWidth, false);
+        multiSpace(6);
+        centerText("Runs Per Test", boxWidth, true);
+        multiSpace(4);
+        center(boxWidth - padding * 2, boxWidth);
+        ImGui.setNextItemWidth(boxWidth - padding * 2);
+        ImGui.pushStyleColor(ImGuiCol.FrameBg, ImColor.rgb(239, 121, 0));
+        ImGui.inputInt("##Runs", NativeTest.getRunsPerTest(), -1);
+        ImGui.popStyleColor();
         multiSpace(14);
-        centerText("Run: " + currentRun.get(), boxWidth, false);
+        centerText("Run: " + (currentRun.get() + 1), boxWidth, false);
 
         ImGui.endChild();
 
-        ImGui.popStyleColor();
+        ImGui.popStyleColor(5);
 
-        // ---------------- Bottom Button and Progress Bar ----------------
+        // ---------------- Bottom Button ----------------
+        // Shared between Progress Bar and Button
+        float progress = CURRENT_TEST_INDEX.floatValue() / TOTAL_TESTS.floatValue();
 
         float totalHeight = progressBarHeight + spacing + buttonHeight + 2 * padding;
         float startY = windowHeight - totalHeight;
@@ -162,28 +218,67 @@ public class TestingGUI extends Application {
 
         float buttonWidth = 150.0f;
         ImGui.setCursorPosX((windowWidth - buttonWidth) / 2);
-        if (!ran && ImGui.button("Start Tests", buttonWidth, buttonHeight)) {
+        ImGui.pushStyleColor(ImGuiCol.Button, ImColor.rgb(239, 121, 0));
+        ImGui.pushStyleColor(ImGuiCol.ButtonHovered, ImColor.rgb(255, 140, 20));
+        ImGui.pushStyleColor(ImGuiCol.ButtonActive, ImColor.rgb(255, 120, 0));
+        boolean testsComplete = progress == 1.0f;
+        String buttonLabel;
+        if (testsComplete) {
+            buttonLabel = "Retest";
+            ran = false;
+        } else {
+            buttonLabel = "Start Tests";
+        }
+        if (!ran && ImGui.button(buttonLabel, buttonWidth, buttonHeight)) {
             new Thread(NativeTest::invokeTests).start();
             ran = true;
         }
+        ImGui.popStyleColor(3);
 
+        // ---------------- Progress Bar ----------------
         ImGui.setCursorPosY(ImGui.getCursorPosY() + spacing);
 
-        float progress = CURRENT_TEST_INDEX.floatValue() / TOTAL_TESTS.floatValue();
+
         float progressBarWidth = 300.0f;
         ImGui.setCursorPosX((windowWidth - progressBarWidth) / 2);
-        ImGui.progressBar(progress, progressBarWidth, progressBarHeight);
+
+        float barPosX = ImGui.getCursorScreenPosX();
+        float barPosY = ImGui.getCursorScreenPosY();
+
+        ImGui.pushStyleColor(ImGuiCol.PlotHistogram, ImColor.rgb(255, 140, 20));
+        ImGui.pushStyleColor(ImGuiCol.FrameBg, ImColor.rgb(189, 71, 0));
+        ImGui.progressBar(progress, progressBarWidth, progressBarHeight, "");
+        ImGui.popStyleColor(2);
+
+        String percentText = String.format("%.0f%%", progress * 100);
+        float textWidth = ImGui.calcTextSizeX(percentText);
+        float textHeight = ImGui.getFontSize();
+        float textPosX = barPosX + (progressBarWidth - textWidth) / 2;
+        float textPosY = barPosY + (progressBarHeight - textHeight) / 2;
+        ImGui.getWindowDrawList().addText(textPosX, textPosY, ImGui.getColorU32(ImGuiCol.Text), percentText);
 
         ImGui.end();
     }
 
+    private static void accessHashMap() {
+        try {
+            SAFETY_LOCK.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void centerText(String text, float windowWidth, boolean underline) {
-        ImGui.setCursorPosX(windowWidth / 2 - ImGui.calcTextSizeX(text) / 2);
+        ImGui.setCursorPosX((windowWidth - ImGui.calcTextSizeX(text)) / 2);
         if (underline) {
             underlinedText(text);
         } else {
             ImGui.text(text);
         }
+    }
+
+    private static void center(float objWidth, float windowWidth) {
+        ImGui.setCursorPosX((windowWidth - objWidth) / 2);
     }
 
     private static void underlinedText(String text) {
