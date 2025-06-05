@@ -436,18 +436,18 @@ pub extern "C" fn atan_2(mut y: f64, mut x: f64) -> f64 {
         if bl3 {
             std::mem::swap(&mut x, &mut y)
         }
-
-        // TODO Fast inverse square
+        
         let e: f64 = fast_inverse_sqrt(d);
         x *= e;
         y *= e;
         let f: f64 = ROUNDER_256THS + y;
-        let i: i32 = f.to_bits() as i32;
-        let g: f64 = ARCSIN_TABLE[i as usize];
-        let h: f64 = COSIN_OF_ARCSIN_TABLE[i as usize];
+        let i: usize = (f.to_bits() as u32) as usize;
+        let g: f64 = ARCSIN_TABLE[i];
+        let h: f64 = COSIN_OF_ARCSIN_TABLE[i];
         let j: f64 = f - ROUNDER_256THS;
         let k: f64 = y * h - x * j;
         let l: f64 = (6.0 + k * k) * k * 0.16666666666666666;
+        
         let mut m: f64 = g + l;
         if bl3 {
             m = std::f64::consts::FRAC_PI_2 - m;

@@ -26,7 +26,7 @@ public class OxidiziumMixinPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (Oxidizium.DEBUG_MODE) {
-            return false;
+            return mixinClassName.contains("WindowMixin");
         }
         if (this.mixinPackage != null && !mixinClassName.startsWith(this.mixinPackage)) {
             return true;

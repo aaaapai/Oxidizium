@@ -7,7 +7,8 @@
   "mixins": [
     "LinuxFixMixin",
     "MathHelperMixin",
-    "compat.LithiumMathHelperMixin"
+    "compat.LithiumMathHelperMixin",
+    "testing.WindowMixin"
   ],
   "client": [
   ],

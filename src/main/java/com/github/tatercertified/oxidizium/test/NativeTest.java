@@ -8,16 +8,27 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class NativeTest {
     private static final float FLOAT_TOLERANCE = 0.0001F;
     private static final double DOUBLE_TOLERANCE = 0.0000001;
+    private static final Deque<Runnable> TASKS = new ArrayDeque<>();
+    private static int totalRuns = 0;
 
-    public static void invokeTests() {
+    public static void prepareTests() {
         testFramework("com/github/tatercertified/oxidizium/mixin/MathHelperMixin", "Native Math", MathHelper.class, 50, float.class, double.class, int.class, long.class, byte.class);
         testFramework("com/github/tatercertified/oxidizium/mixin/compat/LithiumMathHelperMixin", "Native Math Lithium Compat", MathHelper.class, 50, float.class, double.class, int.class, long.class, byte.class);
+        TestingGUI.setTotalTests(totalRuns);
+    }
+
+    public static void invokeTests() {
+        while (!TASKS.isEmpty()) {
+            TASKS.poll().run();
+        }
     }
 
     /**
@@ -37,36 +48,69 @@ public class NativeTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        boolean testsFailed = false;
-        Oxidizium.TEST_LOGGER.info("Starting {} Test", testName);
-        for (int i = 0; i < runs; i++) {
-            for (Method method : mixin.getDeclaredMethods()) {
-                try {
-                    Method mathHelperMethod = vanillaClass.getMethod(method.getName(), method.getParameterTypes());
-                    if (returnFilter == null || Arrays.stream(returnFilter).anyMatch(clazz -> clazz == method.getReturnType())) {
-                        try {
-                            testsFailed = !invokeAndTest(method, mathHelperMethod);
-                        } catch (Exception e) {
-                            Oxidizium.TEST_LOGGER.info("\u001B[31m {} ({}) Has Errored \u001B[0m", method.getName(), method.getParameterTypes());
-                            Oxidizium.TEST_LOGGER.warn(e.toString());
-                            testsFailed = true;
+
+        totalRuns += (getTotalTestedMethods(mixin, vanillaClass, returnFilter) * runs);
+
+        Runnable test = () -> {
+            Oxidizium.TEST_LOGGER.info("Starting {} Test", testName);
+            TestingGUI.setCurrentTestName(testName);
+            TestingGUI.setCurrentClass(vanillaClass.getSimpleName());
+            for (int i = 0; i < runs; i++) {
+                TestingGUI.setCurrentRun(i);
+                for (Method method : mixin.getDeclaredMethods()) {
+                    try {
+                        Method vanillaMethod = vanillaClass.getMethod(method.getName(), method.getParameterTypes());
+                        if (returnFilter == null || Arrays.stream(returnFilter).anyMatch(clazz -> clazz == method.getReturnType())) {
+                            TestingGUI.setCurrentMethod(formatMethod(vanillaMethod));
+                            try {
+                                invokeAndTest(method, vanillaMethod);
+                            } catch (Exception e) {
+                                Oxidizium.TEST_LOGGER.info("\u001B[31m {} ({}) Has Errored \u001B[0m", method.getName(), method.getParameterTypes());
+                                TestingGUI.addError(formatMethod(vanillaMethod), false, e.toString());
+                                Oxidizium.TEST_LOGGER.warn(e.toString());
+                            }
                         }
+                    } catch (NoSuchMethodException _) {
                     }
-                } catch (NoSuchMethodException _) {
                 }
             }
-            if (testsFailed) {
-                break;
-            }
-        }
-        if (testsFailed) {
-            Oxidizium.TEST_LOGGER.info("\u001B[31m {} Test Has Failed \u001B[0m", testName);
-        } else {
-            Oxidizium.TEST_LOGGER.info("{} Test Has Passed", testName);
-        }
+            Oxidizium.TEST_LOGGER.info("{} Test Has Concluded", testName);
+        };
+        TASKS.add(test);
     }
 
-    private static boolean invokeAndTest(Method nativeMethod, Method javaMethod) throws Exception {
+    private static int getTotalTestedMethods(Class<?> clazz, Class<?> vanillaClass, @Nullable Class<?>... returnFilter) {
+        int count = 0;
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (Arrays.stream(returnFilter).anyMatch(clazz1 -> clazz1 == method.getReturnType())) {
+                try {
+                    vanillaClass.getMethod(method.getName(), method.getParameterTypes());
+                } catch (NoSuchMethodException e) {
+                    continue;
+                }
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static String formatMethod(Method method) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(method.getName()).append("(");
+
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        for (int i = 0; i < parameterTypes.length; i++) {
+            builder.append(parameterTypes[i].getSimpleName());
+            if (i < parameterTypes.length - 1) {
+                builder.append(", ");
+            }
+        }
+
+        builder.append(")");
+        return builder.toString();
+    }
+
+    private static void invokeAndTest(Method nativeMethod, Method javaMethod) throws Exception {
         Class<?>[] parameterTypes = nativeMethod.getParameterTypes();
         Object[] args = new Object[parameterTypes.length];
 
@@ -80,13 +124,13 @@ public class NativeTest {
         Object nativeResult = nativeMethod.invoke(null, args);
         Object javaResult = javaMethod.invoke(null, args);
 
-        boolean resultsEqual = areResultsEquivalent(nativeResult, javaResult, nativeMethod.getReturnType());
+        boolean resultsEqual = areResultsEquivalent(nativeResult, javaResult, nativeMethod.getReturnType(), javaMethod);
 
-        return assertTrue(resultsEqual,
+        assertTrue(resultsEqual,
                 String.format("\u001B[31m %s is invalid: %s != %s \u001B[0m", nativeMethod.getName(), nativeResult, javaResult));
     }
 
-    private static boolean areResultsEquivalent(Object nativeResult, Object javaResult, Class<?> returnType) {
+    private static boolean areResultsEquivalent(Object nativeResult, Object javaResult, Class<?> returnType, Method vanillaMethod) {
         boolean acceptable;
         boolean exact = true;
         if (returnType.equals(float.class)) {
@@ -103,6 +147,7 @@ public class NativeTest {
 
         if (acceptable && !exact) {
             Oxidizium.TEST_LOGGER.warn("Precision issue detected: {} != {}", nativeResult, javaResult);
+            TestingGUI.addError(formatMethod(vanillaMethod), true, nativeResult + " != " + javaResult);
         }
 
         return acceptable;
@@ -114,9 +159,15 @@ public class NativeTest {
         Integer maxIndex = null;
 
         for (int i = 0; i < parameters.length; i++) {
-            if ("min".equals(parameters[i].getName())) {
+            if (parameters[i].isAnnotationPresent(NonZero.class) &&
+                    ((Number) args[i]).intValue() == 0
+            ) {
+                args[i] = ((Number) args[i]).intValue() + 1;
+            }
+
+            if (parameters[i].isAnnotationPresent(Min.class)) {
                 minIndex = i;
-            } else if ("max".equals(parameters[i].getName())) {
+            } else if (parameters[i].isAnnotationPresent(Max.class)) {
                 maxIndex = i;
             }
         }
@@ -152,10 +203,9 @@ public class NativeTest {
         };
     }
 
-    private static boolean assertTrue(boolean bool, String ifFailed) {
+    private static void assertTrue(boolean bool, String ifFailed) {
         if (!bool) {
             Oxidizium.TEST_LOGGER.error(ifFailed);
         }
-        return bool;
     }
 }

@@ -1,9 +1,11 @@
 package com.github.tatercertified.oxidizium.mixin;
 
+import com.github.tatercertified.oxidizium.test.Max;
+import com.github.tatercertified.oxidizium.test.Min;
+import com.github.tatercertified.oxidizium.test.NonZero;
 import com.github.tatercertified.rust.lib_h;
 import com.moulberry.mixinconstraints.annotations.IfModAbsent;
 import net.minecraft.util.math.MathHelper;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
@@ -125,7 +127,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static int clamp(int value, int min, int max) {
+    public static int clamp(int value, @Min int min, @Max int max) {
         return lib_h.clamp_int(value, min, max);
     }
 
@@ -134,7 +136,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static long clamp(long value, long min, long max) {
+    public static long clamp(long value, @Min long min, @Max long max) {
         return lib_h.clamp_long(value, min, max);
     }
 
@@ -143,7 +145,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static float clamp(float value, float min, float max) {
+    public static float clamp(float value, @Min float min, @Max float max) {
         return lib_h.clamp_float(value, min, max);
     }
 
@@ -152,7 +154,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static double clamp(double value, double min, double max) {
+    public static double clamp(double value, @Min double min, @Max double max) {
         return lib_h.clamp_double(value, min, max);
     }
 
@@ -215,7 +217,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static int floorMod(int dividend, int divisor) {
+    public static int floorMod(int dividend, @NonZero int divisor) {
         return lib_h.floor_mod_int(dividend, divisor);
     }
 
@@ -224,7 +226,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static float floorMod(float dividend, float divisor) {
+    public static float floorMod(float dividend, @NonZero float divisor) {
         return lib_h.floor_mod_float(dividend, divisor);
     }
 
@@ -233,7 +235,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static double floorMod(double dividend, double divisor) {
+    public static double floorMod(double dividend, @NonZero double divisor) {
         return lib_h.floor_mod_double(dividend, divisor);
     }
 
@@ -705,7 +707,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static int roundUpToMultiple(int value, int divisor) {
+    public static int roundUpToMultiple(int value, @NonZero int divisor) {
         return lib_h.round_up_to_multiple(value, divisor);
     }
 

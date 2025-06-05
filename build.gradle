@@ -15,12 +15,21 @@ repositories {
     mavenCentral()
 }
 
+Set<String> apiModules = [
+        "fabric-api-base",
+        "fabric-lifecycle-events-v1"
+]
+
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    apiModules.forEach {
+        include(modImplementation(fabricApi.module(it, fabric_version)))
+    }
     include(implementation("com.moulberry:mixinconstraints:1.0.8"))
+    include(implementation 'io.github.spair:imgui-java-app:1.89.0')
 }
 
 processResources {
