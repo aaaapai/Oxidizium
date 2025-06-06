@@ -57,7 +57,7 @@ public record Config(String version, boolean debug, boolean reducedMemoryUsage, 
     private static void fillDefaults(String configVer, Properties properties) {
         checkProperty("config-version", configVer, properties);
         checkProperty("debug", "false", properties);
-        checkProperty("reduced-memory-usage", "false", properties);
+        checkProperty("reduced-memory-usage", "true", properties);
         checkProperty("enhanced-lithium-compat", "true", properties);
     }
 

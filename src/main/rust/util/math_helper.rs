@@ -57,30 +57,30 @@ pub extern "C" fn sin_float(x: f32) -> f32 {
     SINE_TABLE[((x * 10430.378_f32) as i32 & 65535) as usize]
 }
 
-fn lookup(index: u32) -> f32 {
+fn lookup(index: i32) -> f32 {
     if index == 32768 {
         return *SINE_TABLE_MIDPOINT_OPT;
     }
 
-    let neg: u32 = (index & 0x8000) << 16;
-    let mask: i32 = ((index as i32) << 17) >> 31;
-    let mut pos: i32 = (0x8001 & mask) + (index as i32 ^ mask);
+    let neg: i32 = (index & 0x8000) << 16;
+    let mask: i32 = (index << 17) >> 31;
+    let mut pos: i32 = (0x8001 & mask) + (index ^ mask);
     pos &= 0x7fff;
-    f32::from_bits(SINE_TABLE_OPT[pos as usize] ^ neg)
+    f32::from_bits(SINE_TABLE_OPT[pos as usize] ^ neg as u32)
 }
 
 /// Computes the sine of an input, x, in radians
 /// Optimized version from Lithium
 #[no_mangle]
 pub extern "C" fn lithium_sin_float(x: f32) -> f32 {
-    lookup(((x * 10430.378_f32) as i32 & 0xFFFF) as u32)
+    lookup((x * 10430.378_f32) as i32 & 0xFFFF)
 }
 
 /// Computes the cosine of an input, x, in radians
 /// Optimized version from Lithium
 #[no_mangle]
 pub extern "C" fn lithium_cos_float(x: f32) -> f32 {
-    lookup(((x * 10430.378_f32 + 16384.0_f32) as i32 & 0xFFFF) as u32)
+    lookup((x * 10430.378_f32 + 16384.0_f32) as i32 & 0xFFFF)
 }
 
 /// Computes the cosine of an input, x, in radians
@@ -436,7 +436,7 @@ pub extern "C" fn atan_2(mut y: f64, mut x: f64) -> f64 {
         if bl3 {
             std::mem::swap(&mut x, &mut y)
         }
-        
+
         let e: f64 = fast_inverse_sqrt(d);
         x *= e;
         y *= e;
@@ -447,7 +447,7 @@ pub extern "C" fn atan_2(mut y: f64, mut x: f64) -> f64 {
         let j: f64 = f - ROUNDER_256THS;
         let k: f64 = y * h - x * j;
         let l: f64 = (6.0 + k * k) * k * 0.16666666666666666;
-        
+
         let mut m: f64 = g + l;
         if bl3 {
             m = std::f64::consts::FRAC_PI_2 - m;
