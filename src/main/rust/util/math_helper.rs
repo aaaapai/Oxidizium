@@ -73,14 +73,14 @@ fn lookup(index: u32) -> f32 {
 /// Optimized version from Lithium
 #[no_mangle]
 pub extern "C" fn lithium_sin_float(x: f32) -> f32 {
-    lookup((x * 10430.378_f32) as u32 & 0xFFFF)
+    lookup(((x * 10430.378_f32) as i32 & 0xFFFF) as u32)
 }
 
 /// Computes the cosine of an input, x, in radians
 /// Optimized version from Lithium
 #[no_mangle]
 pub extern "C" fn lithium_cos_float(x: f32) -> f32 {
-    lookup((x * 10430.378_f32 + 16384.0_f32) as u32 & 0xFFFF)
+    lookup(((x * 10430.378_f32 + 16384.0_f32) as i32 & 0xFFFF) as u32)
 }
 
 /// Computes the cosine of an input, x, in radians

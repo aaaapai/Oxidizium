@@ -208,9 +208,9 @@ public class NativeTest {
 
     private static Number getCorrectValue(Class<?> type) {
         return switch (type.getName()) {
-            case "float" -> ThreadLocalRandom.current().nextFloat(0.0F, (float) (Math.PI * 2.0F));
+            case "float" -> ThreadLocalRandom.current().nextFloat((float) (-Math.PI * 2.0F), (float) (Math.PI * 2.0F));
             case "int" -> ThreadLocalRandom.current().nextInt(0, 1000);
-            case "double" -> ThreadLocalRandom.current().nextDouble(0.0, Math.PI * 2.0);
+            case "double" -> ThreadLocalRandom.current().nextDouble(-Math.PI * 2.0, Math.PI * 2.0);
             case "long" -> ThreadLocalRandom.current().nextLong(0, 1000);
             case "byte" -> (byte) ThreadLocalRandom.current().nextInt(0, 128);
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
