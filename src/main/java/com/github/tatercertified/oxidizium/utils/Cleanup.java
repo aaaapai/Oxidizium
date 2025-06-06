@@ -1,5 +1,6 @@
 package com.github.tatercertified.oxidizium.utils;
 
+import com.github.tatercertified.oxidizium.Config;
 import net.minecraft.util.math.MathHelper;
 import sun.misc.Unsafe;
 
@@ -7,13 +8,16 @@ import java.lang.reflect.Field;
 
 public final class Cleanup {
     public static void cleanupClasses() {
-        cleanupMathHelper();
+        if (!Config.getInstance().debug() && Config.getInstance().reducedMemoryUsage()) {
+            cleanupMathHelper();
+        }
     }
 
     private static void cleanupMathHelper() {
         try {
             removeArray(MathHelper.class, "ARCSINE_TABLE");
             removeArray(MathHelper.class, "COSINE_OF_ARCSINE_TABLE");
+            removeArray(MathHelper.class, "SINE_TABLE");
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -32,7 +36,7 @@ public final class Cleanup {
         Object staticFieldBase = unsafe.staticFieldBase(field);
         long staticFieldOffset = unsafe.staticFieldOffset(field);
 
-        // Set to a new empty array
-        unsafe.putObject(staticFieldBase, staticFieldOffset, new double[0]);
+        // Set to a null
+        unsafe.putObject(staticFieldBase, staticFieldOffset, null);
     }
 }

@@ -13,6 +13,7 @@ base {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -20,7 +21,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    include(implementation("com.moulberry:mixinconstraints:1.0.8"))
+    include(implementation 'com.github.Tater-Certified:MixinConstraints:4856759a06')
     include(implementation 'io.github.spair:imgui-java-app:1.89.0')
 }
 

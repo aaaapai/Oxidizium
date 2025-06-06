@@ -840,7 +840,7 @@ pub extern "C" fn magnitude_double(a: f64, b: f64, c: f64) -> f64 {
 /// Gets the magnitude of the vector
 #[no_mangle]
 pub extern "C" fn magnitude_float(a: f32, b: f32, c: f32) -> f32 {
-    squared_magnitude(a as f64, b as f64, c as f64) as f32
+    a * a + b * b + c * c
 }
 
 /// Returns a rounded down to the nearest multiple of b.

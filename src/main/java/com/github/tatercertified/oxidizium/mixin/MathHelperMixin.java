@@ -4,37 +4,19 @@ import com.github.tatercertified.oxidizium.test.Max;
 import com.github.tatercertified.oxidizium.test.Min;
 import com.github.tatercertified.oxidizium.test.NonZero;
 import com.github.tatercertified.rust.lib_h;
-import com.moulberry.mixinconstraints.annotations.IfModAbsent;
+import com.moulberry.mixinconstraints.annotations.IfBoolean;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.function.Consumer;
-
+@IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isDebugEnabled", negate = true)
 @Mixin(MathHelper.class)
 public class MathHelperMixin {
-
-    // Remove useless things
-    @Redirect(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Util;make(Ljava/lang/Object;Ljava/util/function/Consumer;)Ljava/lang/Object;"))
-    private static <T> Object dontMake(T object, Consumer<? super T> initializer) {
-        return null;
-    }
-
-    @Inject(method = "<clinit>", at = @At(value = "INVOKE", target = "Ljava/lang/Math;asin(D)D"), cancellable = true)
-    private static void cancelArrayFill(CallbackInfo ci) {
-        ci.cancel();
-    }
-
-    // Implement Rust
     /**
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @IfModAbsent("lithium")
+    @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isLithiumOptimizationEnabled", negate = true)
     @Overwrite
     public static float sin(float value) {
         return lib_h.sin_float(value);
@@ -44,7 +26,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @IfModAbsent("lithium")
+    @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isLithiumOptimizationEnabled", negate = true)
     @Overwrite
     public static float cos(float value) {
         return lib_h.cos_float(value);
@@ -787,7 +769,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @IfModAbsent("lithium")
+    @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isLithiumOptimizationEnabled", negate = true)
     @Overwrite
     public static float easeInOutSine(float value) {
         return lib_h.ease_in_out_sine(value);

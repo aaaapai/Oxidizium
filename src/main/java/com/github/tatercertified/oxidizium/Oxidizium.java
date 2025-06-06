@@ -10,8 +10,6 @@ public class Oxidizium implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("Oxidizium");
     @Override
     public void onInitialize() {
-        if (!Config.getInstance().debug()) {
-            Cleanup.cleanupClasses();
-        }
+        Cleanup.cleanupClasses();
     }
 }
