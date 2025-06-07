@@ -1,15 +1,13 @@
 package com.github.tatercertified.oxidizium.mixin;
 
-import com.github.tatercertified.oxidizium.test.Max;
-import com.github.tatercertified.oxidizium.test.Min;
-import com.github.tatercertified.oxidizium.test.NonZero;
+import com.github.tatercertified.oxidizium.test.*;
 import com.github.tatercertified.rust.lib_h;
 import com.moulberry.mixinconstraints.annotations.IfBoolean;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-@IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isDebugEnabled", negate = true)
+@IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isTestingEnabled", negate = true)
 @Mixin(MathHelper.class)
 public class MathHelperMixin {
     /**
@@ -37,7 +35,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static float sqrt(float value) {
+    public static float sqrt(@PositiveOnly float value) {
         return lib_h.sqrt_float(value);
     }
 
@@ -307,7 +305,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static float clampAngle(float value, float mean, float delta) {
+    public static float clampAngle(@PositiveOnly float value, @PositiveOnly float mean, @PositiveOnly float delta) {
         return lib_h.clamp_angle(value, mean, delta);
     }
 
@@ -370,7 +368,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static float fractionalPart(float value) {
+    public static float fractionalPart(@PositiveOnly float value) {
         return lib_h.fractional_part_float(value);
     }
 
@@ -379,7 +377,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static double fractionalPart(double value) {
+    public static double fractionalPart(@PositiveOnly double value) {
         return lib_h.fractional_part_double(value);
     }
 
@@ -425,7 +423,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static float inverseSqrt(float x) {
+    public static float inverseSqrt(@Bounded(minInclusive = 1, maxExclusive = 100) float x) {
         return lib_h.inverse_sqrt_float(x);
     }
 
@@ -434,7 +432,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static double inverseSqrt(double x) {
+    public static double inverseSqrt(@Bounded(minInclusive = 1, maxExclusive = 100) double x) {
         return lib_h.inverse_sqrt_double(x);
     }
 
@@ -452,7 +450,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static int hsvToRgb(float hue, float saturation, float value) {
+    public static int hsvToRgb(@PositiveOnly float hue, @PositiveOnly float saturation, @PositiveOnly float value) {
         return lib_h.hsv_to_rgb(hue, saturation, value);
     }
 
@@ -461,7 +459,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static int hsvToArgb(float hue, float saturation, float value, int alpha) {
+    public static int hsvToArgb(@PositiveOnly float hue, @PositiveOnly float saturation, @PositiveOnly float value, @PositiveOnly int alpha) {
         return lib_h.hsv_to_argb(hue, saturation, value, alpha);
     }
 

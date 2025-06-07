@@ -1,3 +1,5 @@
+import java.security.MessageDigest
+
 plugins {
     id 'fabric-loom' version '1.10-SNAPSHOT'
     id 'maven-publish'
@@ -70,6 +72,60 @@ jar {
 
 compileJava {
     options.compilerArgs << '-parameters'
+}
+
+def hashLib = tasks.register('hashLib') {
+    def possibleFiles = [
+            "liboxidizium_linux_x86.so",
+            "liboxidizium_linux_arm64.so",
+            "oxidizium_windows_x86.dll",
+            "oxidizium_windows_arm64.dll",
+            "liboxidizium_mac_x86.dylib",
+            "liboxidizium_mac_arm64.dylib"
+    ]
+
+    def foundFile = null
+
+    doLast {
+        // Find the first existing file
+        for (String path : possibleFiles) {
+            def f = file("src/main/resources/${path}")
+            if (f.exists()) {
+                foundFile = f
+                break
+            }
+        }
+
+        if (foundFile == null) {
+            throw new GradleException("None of the expected files were found.")
+        }
+
+        def outputFile = file("src/main/resources/oxidizium_rust.hash")
+
+        // Read file bytes
+        byte[] fileBytes = foundFile.bytes
+
+        // Generate SHA-256 hash
+        MessageDigest digest = MessageDigest.getInstance("SHA-256")
+        byte[] hashBytes = digest.digest(fileBytes)
+
+        // Convert to hex string
+        StringBuilder hexString = new StringBuilder()
+        for (byte b : hashBytes) {
+            String hex = Integer.toHexString(0xff & b)
+            if (hex.length() == 1) hexString.append('0')
+            hexString.append(hex)
+        }
+
+        // Write the hash to output file
+        outputFile.text = hexString.toString()
+
+        println "Hashed ${foundFile.name} -> ${outputFile.name}"
+    }
+}
+
+tasks.named("jar") {
+    dependsOn(hashLib)
 }
 
 // configure the maven publication

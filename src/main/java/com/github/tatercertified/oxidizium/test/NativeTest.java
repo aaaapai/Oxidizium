@@ -141,6 +141,10 @@ public class NativeTest {
 
         boolean resultsEqual = areResultsEquivalent(nativeResult, javaResult, nativeMethod.getReturnType(), javaMethod);
 
+        if (!resultsEqual) {
+            TestingGUI.addError(formatMethod(javaMethod), false, nativeResult + " != " + javaResult);
+        }
+
         assertTrue(resultsEqual,
                 String.format("\u001B[31m %s is invalid: %s != %s \u001B[0m", nativeMethod.getName(), nativeResult, javaResult));
     }
@@ -179,6 +183,15 @@ public class NativeTest {
                 args[i] = ((Number) args[i]).intValue() + 1;
             }
 
+            if (parameters[i].isAnnotationPresent(PositiveOnly.class)) {
+                args[i] = Math.abs(((Number) args[i]).intValue());
+            }
+
+            if (parameters[i].isAnnotationPresent(Bounded.class)) {
+                Bounded bounded = parameters[i].getAnnotation(Bounded.class);
+                args[i] = getCorrectValueBounded(parameters[i].getType(), bounded.minInclusive(), bounded.maxExclusive());
+            }
+
             if (parameters[i].isAnnotationPresent(Min.class)) {
                 minIndex = i;
             } else if (parameters[i].isAnnotationPresent(Max.class)) {
@@ -213,6 +226,17 @@ public class NativeTest {
             case "double" -> ThreadLocalRandom.current().nextDouble(-Math.PI * 2.0, Math.PI * 2.0);
             case "long" -> ThreadLocalRandom.current().nextLong(0, 1000);
             case "byte" -> (byte) ThreadLocalRandom.current().nextInt(0, 128);
+            default -> throw new IllegalArgumentException("Unsupported type: " + type);
+        };
+    }
+
+    private static Number getCorrectValueBounded(Class<?> type, double lower, double upper) {
+        return switch (type.getName()) {
+            case "float" -> ThreadLocalRandom.current().nextFloat((float) lower, (float) upper);
+            case "int" -> ThreadLocalRandom.current().nextInt((int) lower, (int) upper);
+            case "double" -> ThreadLocalRandom.current().nextDouble(lower, upper);
+            case "long" -> ThreadLocalRandom.current().nextLong((long) lower, (long) upper);
+            case "byte" -> (byte) ThreadLocalRandom.current().nextInt((int) lower, (int) upper);
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         };
     }

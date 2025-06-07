@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 
 @IfBooleans(value = {
         @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isLithiumOptimizationEnabled"),
-        @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isDebugEnabled", negate = true)
+        @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isTestingEnabled", negate = true)
 })
 @Mixin(MathHelper.class)
 public class LithiumMathHelperMixin {

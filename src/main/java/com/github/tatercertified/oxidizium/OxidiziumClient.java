@@ -8,7 +8,7 @@ import static imgui.app.Application.launch;
 public class OxidiziumClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        if (Config.getInstance().debug()) {
+        if (Config.getInstance().test()) {
             launch(new TestingGUI());
         }
     }

@@ -140,25 +140,33 @@ pub extern "C" fn ceil_double(x: f64) -> i32 {
 /// Limits the input x between a minimum and maximum value
 #[no_mangle]
 pub extern "C" fn clamp_int(x: i32, min: i32, max: i32) -> i32 {
-    x.clamp(min, max)
+    x.max(min).min(max)
 }
 
 /// Limits the input x between a minimum and maximum value
 #[no_mangle]
 pub extern "C" fn clamp_long(x: i64, min: i64, max: i64) -> i64 {
-    x.clamp(min, max)
+    x.max(min).min(max)
 }
 
 /// Limits the input x between a minimum and maximum value
 #[no_mangle]
 pub extern "C" fn clamp_float(x: f32, min: f32, max: f32) -> f32 {
-    x.clamp(min, max)
+    if min <= max {
+        x.max(min).min(max)
+    } else {
+        x
+    }
 }
 
 /// Limits the input x between a minimum and maximum value
 #[no_mangle]
 pub extern "C" fn clamp_double(x: f64, min: f64, max: f64) -> f64 {
-    x.clamp(min, max)
+    if min <= max {
+        x.max(min).min(max)
+    } else {
+        x
+    }
 }
 
 /// Limits Linear Interpolation

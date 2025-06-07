@@ -1,5 +1,6 @@
 package com.github.tatercertified.oxidizium;
 
+import com.github.tatercertified.oxidizium.utils.HashUtils;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -45,6 +46,14 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
             throw new IllegalStateException("Unsupported OS: " + osName);
         }
 
+        copyNativeLib(binaryName, outputName);
+    }
+
+    public static Path getWorkingDir() {
+        return Paths.get("").toAbsolutePath();
+    }
+
+    private static void copyNativeLib(String binaryName, String outputName) {
         try (InputStream inputStream = LoadRustBinary.class.getResourceAsStream("/" + binaryName)) {
             if (inputStream == null) {
                 throw new RuntimeException("Resource not found: /" + binaryName);
@@ -53,15 +62,11 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
             int lastDotIndex = binaryName.lastIndexOf('.');
             String extension = binaryName.substring(lastDotIndex + 1);
             Path destinationPath = workingDir.resolve(outputName + "." + extension);
-            if (Files.notExists(destinationPath)) {
+            if (Files.notExists(destinationPath) || !HashUtils.checkHash(destinationPath)) {
                 Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static Path getWorkingDir() {
-        return Paths.get("").toAbsolutePath();
     }
 }

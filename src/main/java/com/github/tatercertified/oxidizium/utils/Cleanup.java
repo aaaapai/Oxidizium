@@ -8,23 +8,23 @@ import java.lang.reflect.Field;
 
 public final class Cleanup {
     public static void cleanupClasses() {
-        if (!Config.getInstance().debug() && Config.getInstance().reducedMemoryUsage()) {
+        if (!Config.getInstance().test() && Config.getInstance().reducedMemoryUsage()) {
             cleanupMathHelper();
         }
     }
 
     private static void cleanupMathHelper() {
         try {
-            removeArray(MathHelper.class, "ARCSINE_TABLE");
-            removeArray(MathHelper.class, "COSINE_OF_ARCSINE_TABLE");
-            removeArray(MathHelper.class, "SINE_TABLE");
+            removeArray(MathHelper.class, "field_15727", double[].class);
+            removeArray(MathHelper.class, "field_15722", double[].class);
+            removeArray(MathHelper.class, "field_15725", float[].class);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void removeArray(Class clazz, String fieldName) throws NoSuchFieldException, IllegalAccessException {
-        Field field = clazz.getDeclaredField(fieldName);
+    private static void removeArray(Class<?> clazz, String intermediaryFieldName, Class<?> arrayType) throws NoSuchFieldException, IllegalAccessException {
+        Field field = MappingTranslator.resolveField(clazz, intermediaryFieldName, arrayType);
         field.setAccessible(true);
 
         // Get Unsafe instance
