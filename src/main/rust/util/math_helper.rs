@@ -152,20 +152,20 @@ pub extern "C" fn clamp_long(x: i64, min: i64, max: i64) -> i64 {
 /// Limits the input x between a minimum and maximum value
 #[no_mangle]
 pub extern "C" fn clamp_float(x: f32, min: f32, max: f32) -> f32 {
-    if min <= max {
-        x.max(min).min(max)
+    if x < min {
+        min
     } else {
-        x
+        x.min(max)
     }
 }
 
 /// Limits the input x between a minimum and maximum value
 #[no_mangle]
 pub extern "C" fn clamp_double(x: f64, min: f64, max: f64) -> f64 {
-    if min <= max {
-        x.max(min).min(max)
+    if x < min {
+        min
     } else {
-        x
+        x.min(max)
     }
 }
 
