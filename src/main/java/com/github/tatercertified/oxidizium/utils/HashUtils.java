@@ -10,9 +10,9 @@ import java.security.NoSuchAlgorithmException;
 
 public final class HashUtils {
 
-    public static boolean checkHash(Path libPath) {
+    public static boolean checkHash(Path libPath, String currentOSLibName) {
         File libOxidizium = new File(libPath.toUri());
-        String correctHash = getLibHash();
+        String correctHash = getLibHash(currentOSLibName);
         String presentHash = getFileHash(libOxidizium);
         if (!correctHash.equals(presentHash)) {
             Oxidizium.LOGGER.info("Outdated Oxidizium Binary Found. Updating...");
@@ -21,8 +21,8 @@ public final class HashUtils {
         return true;
     }
 
-    private static String getLibHash() {
-        try (InputStream inputStream = HashUtils.class.getResourceAsStream("/oxidizium_rust.hash")) {
+    private static String getLibHash(String binaryName) {
+        try (InputStream inputStream = HashUtils.class.getResourceAsStream("/" + binaryName + ".hash")) {
             if (inputStream == null) {
                 throw new IOException("Hash file not found in resources.");
             }
@@ -31,7 +31,7 @@ public final class HashUtils {
                 return reader.readLine();
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read oxidizium_rust.hash", e);
+            throw new RuntimeException("Failed to read " + binaryName + ".hash", e);
         }
     }
 

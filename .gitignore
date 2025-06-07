@@ -18,4 +18,4 @@ lib.h
 /src/main/java/com/github/tatercertified/rust
 *.dll
 .jdk_path_cache
-src/main/resources/oxidizium_rust.hash
+*.hash
