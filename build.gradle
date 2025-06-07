@@ -122,7 +122,7 @@ def hashLib = tasks.register('hashLib') {
     }
 }
 
-tasks.named("jar") {
+tasks.named("processResources") {
     dependsOn(hashLib)
 }
 
