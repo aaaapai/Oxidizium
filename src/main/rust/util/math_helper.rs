@@ -2,7 +2,7 @@ use once_cell::sync::Lazy;
 use std::num::Wrapping;
 
 const APPROXIMATION_THRESHOLD: f32 = 1.0E-5;
-const MULTIPLY_DE_BRUIJN_BIT_POS: [i32; 32] = [
+const MULTIPLY_DE_BRUIJN_BIT_POS: [i8; 32] = [
     0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26,
     12, 18, 6, 11, 5, 10, 9,
 ];
@@ -378,7 +378,7 @@ pub extern "C" fn ceil_log_2(mut value: i32) -> i32 {
     } else {
         smallest_encompassing_power_of_two(value)
     };
-    MULTIPLY_DE_BRUIJN_BIT_POS[(((value as i64 * 125613361) >> 27) as i32 & 31) as usize]
+    MULTIPLY_DE_BRUIJN_BIT_POS[(((value as u32 * 125613361) >> 27) & 31) as usize] as i32
 }
 
 /// Takes the floor of log2(value) using the de Bruijn sequence
