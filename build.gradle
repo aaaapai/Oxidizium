@@ -74,7 +74,7 @@ compileJava {
     options.compilerArgs << '-parameters'
 }
 
-def hashLib = tasks.register('hashLib') {
+tasks.register('hashLib') {
     def possibleFiles = [
             "liboxidizium_linux_x86",
             "liboxidizium_linux_arm64",
@@ -120,10 +120,6 @@ def hashLib = tasks.register('hashLib') {
             }
         }
     }
-}
-
-tasks.named("processResources") {
-    dependsOn(hashLib)
 }
 
 // configure the maven publication

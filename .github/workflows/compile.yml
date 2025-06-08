@@ -150,6 +150,8 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: 22
+    - name: Hash Natives
+      run: ./gradlew hashLib --no-daemon
     - name: Build with Gradle
       run: ./gradlew build --no-daemon
     - name: Capture build artifacts
