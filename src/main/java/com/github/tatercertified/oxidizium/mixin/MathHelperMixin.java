@@ -305,7 +305,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static float clampAngle(@PositiveOnly float value, @PositiveOnly float mean, @PositiveOnly float delta) {
+    public static float clampAngle( float value, float mean, float delta) {
         return lib_h.clamp_angle(value, mean, delta);
     }
 

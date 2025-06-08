@@ -7,6 +7,8 @@ const MULTIPLY_DE_BRUIJN_BIT_POS: [i32; 32] = [
     12, 18, 6, 11, 5, 10, 9,
 ];
 const ROUNDER_256THS: f64 = f64::from_bits(4805340802404319232);
+const PI: f64 = 3.141592653589793;
+const HALF_PI: f64 = 1.5707963267948966;
 const DOUBLE_PI: f64 = std::f64::consts::PI * 2.0_f64;
 const DOUBLE_PI_F32: f32 = std::f32::consts::PI * 2.0_f32;
 const INVERSE_SQRT: u64 = 6910469410427058090;
@@ -458,11 +460,11 @@ pub extern "C" fn atan_2(mut y: f64, mut x: f64) -> f64 {
 
         let mut m: f64 = g + l;
         if bl3 {
-            m = std::f64::consts::FRAC_PI_2 - m;
+            m = HALF_PI - m;
         }
 
         if bl2 {
-            m = std::f64::consts::PI - m;
+            m = PI - m;
         }
 
         if bl {
