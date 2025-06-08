@@ -130,7 +130,11 @@ public class NativeTest {
         Object[] args = new Object[parameterTypes.length];
 
         for (int i = 0; i < parameterTypes.length; i++) {
-            args[i] = getCorrectValue(parameterTypes[i]);
+            if (parameterTypes[i] == String.class) {
+                args[i] = String.valueOf(getCorrectValue(int.class));
+            } else {
+                args[i] = getCorrectValue(parameterTypes[i]);
+            }
         }
 
         // Adjust values for parameters named 'min' and 'max'
@@ -222,9 +226,9 @@ public class NativeTest {
     private static Number getCorrectValue(Class<?> type) {
         return switch (type.getName()) {
             case "float" -> ThreadLocalRandom.current().nextFloat((float) (-Math.PI * 4.0F), (float) (Math.PI * 4.0F));
-            case "int" -> ThreadLocalRandom.current().nextInt(0, 1000);
+            case "int" -> ThreadLocalRandom.current().nextInt(-1000, 1000);
             case "double" -> ThreadLocalRandom.current().nextDouble(-Math.PI * 4.0, Math.PI * 4.0);
-            case "long" -> ThreadLocalRandom.current().nextLong(0, 1000);
+            case "long" -> ThreadLocalRandom.current().nextLong(-1000, 1000);
             case "byte" -> (byte) ThreadLocalRandom.current().nextInt(0, 128);
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         };

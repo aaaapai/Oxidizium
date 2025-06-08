@@ -1,3 +1,5 @@
+use std::ffi::c_ushort;
+use std::slice;
 use once_cell::sync::Lazy;
 use std::num::Wrapping;
 
@@ -344,12 +346,60 @@ pub extern "C" fn step_unwrapped_angle_towards(from: f32, to: f32, step: f32) ->
     step_towards(from, from + subtract_angles(from, to), step)
 }
 
-// TODO Make parse_int compatible with C (str is incompatible)
 /// Parses the int.
 /// If the parse fails, it reverts to fallback
-//#[no_mangle]
-pub fn parse_int(string: &str, fallback: i32) -> i32 {
-    string.parse::<i32>().unwrap_or(fallback)
+/// Here is the Java code to call this:
+/// ```java
+/// String str = " -123 ";
+/// char[] chars = str.toCharArray(); // UTF-16 characters
+/// 
+/// // You can pass this pointer + length into Rust
+/// int result = lib_h.parse_int_utf16(chars_ptr, chars.length, 0);
+///```
+#[no_mangle]
+pub extern "C" fn parse_int_utf16(ptr: *const c_ushort, len: usize, fallback: i32) -> i32 {
+    if ptr.is_null() || len == 0 {
+        return fallback;
+    }
+
+    let utf16: &[u16] = unsafe { slice::from_raw_parts(ptr, len) };
+
+    let mut result: i32 = 0;
+    let mut negative = false;
+    let mut started = false;
+
+    for &u in utf16 {
+        let ch = u as u32;
+
+        match ch {
+            48..=57 => { // '0'..='9' as u32
+                started = true;
+                match result
+                    .checked_mul(10)
+                    .and_then(|r| r.checked_add((ch - 48) as i32))
+                {
+                    Some(v) => result = v,
+                    None => return fallback, // overflow
+                }
+            }
+            45 if !started => { // '-' as u32
+                negative = true;
+                started = true;
+            }
+            32 | 9 if !started => continue, // allow leading space/tab
+            _ => break, // stop on invalid input
+        }
+    }
+
+    if started {
+        if negative {
+            -result
+        } else {
+            result
+        }
+    } else {
+        fallback
+    }
 }
 
 /// Gets the smallest power of two

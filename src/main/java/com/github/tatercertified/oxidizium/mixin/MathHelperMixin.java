@@ -7,6 +7,8 @@ import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
+import java.lang.foreign.MemorySegment;
+
 @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isTestingEnabled", negate = true)
 @Mixin(MathHelper.class)
 public class MathHelperMixin {
@@ -326,6 +328,21 @@ public class MathHelperMixin {
     public static float stepUnwrappedAngleTowards(float from, float to, float step) {
         return lib_h.step_unwrapped_angle_towards(from, to, step);
     }
+
+    // TODO Determine if this is faster than Java implementation
+    /*
+    /**
+     * @author QPCrummer
+     * @reason Implement in Rust
+     */
+    /*
+    @Overwrite
+    public static int parseInt(String string, int fallback) {
+        char[] chars = string.toCharArray();
+        return lib_h.parse_int_utf16(MemorySegment.ofArray(chars), chars.length, fallback);
+    }
+
+     */
 
     /**
      * @author QPCrummer
