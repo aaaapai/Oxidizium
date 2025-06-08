@@ -390,13 +390,13 @@ pub extern "C" fn floor_log_2(value: i32) -> i32 {
 /// Gets the fractional part of a float
 #[no_mangle]
 pub extern "C" fn fractional_part_float(value: f32) -> f32 {
-    value.fract()
+    value - value.floor()
 }
 
 /// Gets the fractional part of a float
 #[no_mangle]
 pub extern "C" fn fractional_part_double(value: f64) -> f64 {
-    value.fract()
+    value - value.floor()
 }
 
 /// Generates a hash code

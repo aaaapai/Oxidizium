@@ -224,7 +224,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     @Overwrite
-    public static boolean isMultipleOf(int a, int b) {
+    public static boolean isMultipleOf(int a, @NonZero int b) {
         return lib_h.is_multiple_of(a, b);
     }
 
@@ -366,18 +366,22 @@ public class MathHelperMixin {
     /**
      * @author QPCrummer
      * @reason Implement in Rust
+     * Mojang, if you are reading this, learn how to get the fractional part.
+     * Negative values should return negative fractional parts!!!
      */
     @Overwrite
-    public static float fractionalPart(@PositiveOnly float value) {
+    public static float fractionalPart(float value) {
         return lib_h.fractional_part_float(value);
     }
 
     /**
      * @author QPCrummer
      * @reason Implement in Rust
+     * Mojang, if you are reading this, learn how to get the fractional part.
+     * Negative values should return negative fractional parts!!!
      */
     @Overwrite
-    public static double fractionalPart(@PositiveOnly double value) {
+    public static double fractionalPart(double value) {
         return lib_h.fractional_part_double(value);
     }
 

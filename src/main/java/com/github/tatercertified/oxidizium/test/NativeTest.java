@@ -24,7 +24,7 @@ public class NativeTest {
     private static final AtomicReference<ImInt> RUNS_PER_TEST = new AtomicReference<>(new ImInt(50));
 
     public static void prepareTests() {
-        testFramework("com/github/tatercertified/oxidizium/mixin/MathHelperMixin", "Native Math", MathHelper.class, RUNS_PER_TEST.get().intValue(), float.class, double.class, int.class, long.class, byte.class);
+        testFramework("com/github/tatercertified/oxidizium/mixin/MathHelperMixin", "Native Math", MathHelper.class, RUNS_PER_TEST.get().intValue(), float.class, double.class, int.class, long.class, byte.class, boolean.class);
         testFramework("com/github/tatercertified/oxidizium/mixin/compat/LithiumMathHelperMixin", "Native Math Lithium Compat", MathHelper.class, RUNS_PER_TEST.get().intValue(), float.class, double.class, int.class, long.class, byte.class);
         TestingGUI.setTotalTests(totalRuns);
     }
