@@ -16,7 +16,7 @@ jobs:
         cd native
         cargo build -r
     - name: Rename
-      run: mv target/release/liboxidizium.so liboxidizium_linux_x86.so
+      run: mv native/target/release/liboxidizium.so liboxidizium_linux_x86.so
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -37,7 +37,7 @@ jobs:
         cd native
         cargo build -r
     - name: Rename
-      run: mv target/release/liboxidizium.so liboxidizium_linux_arm64.so
+      run: mv native/target/release/liboxidizium.so liboxidizium_linux_arm64.so
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -53,7 +53,7 @@ jobs:
         cd native
         cargo build -r
     - name: Rename
-      run: mv target/release/oxidizium.dll oxidizium_windows_x86.dll
+      run: mv native/target/release/oxidizium.dll oxidizium_windows_x86.dll
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -70,7 +70,7 @@ jobs:
         cd native
         cargo build -r
     - name: Rename
-      run: mv target/release/oxidizium.dll oxidizium_windows_arm64.dll
+      run: mv native/target/release/oxidizium.dll oxidizium_windows_arm64.dll
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -86,7 +86,7 @@ jobs:
         cd native
         cargo build -r
     - name: Rename
-      run: mv target/release/liboxidizium.dylib liboxidizium_mac_x86.dylib
+      run: mv native/target/release/liboxidizium.dylib liboxidizium_mac_x86.dylib
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -102,7 +102,7 @@ jobs:
         cd native
         cargo build -r
     - name: Rename
-      run: mv target/release/liboxidizium.dylib liboxidizium_mac_arm64.dylib
+      run: mv native/target/release/liboxidizium.dylib liboxidizium_mac_arm64.dylib
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -114,17 +114,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Print Working Directory
-      run: pwd
     - name: Download Rust binaries
       uses: actions/download-artifact@v4
       with:
-        path: /home/runner/work/Oxidizium/Oxidizium/oxidizium
+        path: /home/runner/work/Oxidizium/Oxidizium
         merge-multiple: true
-    - name: Change to Oxidizium Directory
-      run: cd oxidizium
-    - name: List Files
-      run: ls -a
     - name: Download Jextract
       run: |
         wget https://download.java.net/java/early_access/jextract/22/6/openjdk-22-jextract+6-47_linux-x64_bin.tar.gz
@@ -132,17 +126,17 @@ jobs:
         tar -xvzf jextract.tar.gz
     - name: Jextract
       run: |
-        jextract-22/bin/jextract --include-dir / --output src/main/java --target-package com.github.tatercertified.rust --library oxidizium lib.h
-        sed -i 's/Linker.Option.critical(false)/Linker.Option.critical(true)/' src/main/java/com/github/tatercertified/rust/lib_h.java
-        sed -i 's/public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);/public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(true));/' src/main/java/com/github/tatercertified/rust/lib_h.java
+        jextract-22/bin/jextract --include-dir / --output oxidizium/src/main/java --target-package com.github.tatercertified.rust --library oxidizium lib.h
+        sed -i 's/Linker.Option.critical(false)/Linker.Option.critical(true)/' oxidizium/src/main/java/com/github/tatercertified/rust/lib_h.java
+        sed -i 's/public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);/public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(true));/' oxidizium/src/main/java/com/github/tatercertified/rust/lib_h.java
     - name: Move Binaries
       run: |
-        mv liboxidizium_mac_arm64.dylib src/main/resources/liboxidizium_mac_arm64.dylib
-        mv liboxidizium_mac_x86.dylib src/main/resources/liboxidizium_mac_x86.dylib
-        mv liboxidizium_linux_arm64.so src/main/resources/liboxidizium_linux_arm64.so
-        mv liboxidizium_linux_x86.so src/main/resources/liboxidizium_linux_x86.so
-        mv oxidizium_windows_arm64.dll src/main/resources/oxidizium_windows_arm64.dll
-        mv oxidizium_windows_x86.dll src/main/resources/oxidizium_windows_x86.dll
+        mv liboxidizium_mac_arm64.dylib oxidizium/src/main/resources/liboxidizium_mac_arm64.dylib
+        mv liboxidizium_mac_x86.dylib oxidizium/src/main/resources/liboxidizium_mac_x86.dylib
+        mv liboxidizium_linux_arm64.so oxidizium/src/main/resources/liboxidizium_linux_arm64.so
+        mv liboxidizium_linux_x86.so oxidizium/src/main/resources/liboxidizium_linux_x86.so
+        mv oxidizium_windows_arm64.dll oxidizium/src/main/resources/oxidizium_windows_arm64.dll
+        mv oxidizium_windows_x86.dll oxidizium/src/main/resources/oxidizium_windows_x86.dll
     - name: Remove Binaries
       uses: geekyeggo/delete-artifact@v5
       with:
@@ -156,9 +150,7 @@ jobs:
           lib.h
         failOnError: false
     - name: Make Gradlew Executable
-      run: |
-        cd ..
-        chmod +x gradlew
+      run: chmod +x gradlew
     - name: Validate the Gradle Wrapper
       uses: gradle/actions/wrapper-validation@v4
     - name: Setup JDK
