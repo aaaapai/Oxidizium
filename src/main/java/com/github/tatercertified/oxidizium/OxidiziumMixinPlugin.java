@@ -1,5 +1,6 @@
 package com.github.tatercertified.oxidizium;
 
+import com.github.tatercertified.oxidizium.utils.asm.StripProcessor;
 import com.moulberry.mixinconstraints.MixinConstraints;
 import com.moulberry.mixinconstraints.mixin.MixinConstraintsBootstrap;
 import org.objectweb.asm.tree.ClassNode;
@@ -14,9 +15,9 @@ public class OxidiziumMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String s) {
+        Config.init();
         this.mixinPackage = s;
         MixinConstraintsBootstrap.init(mixinPackage);
-        Config.init();
     }
 
     @Override
@@ -42,7 +43,8 @@ public class OxidiziumMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public void preApply(String s, ClassNode classNode, String s1, IMixinInfo iMixinInfo) {
+    public void preApply(String targetClassName, ClassNode classNode, String mixinClassName, IMixinInfo iMixinInfo) {
+        StripProcessor.processStrips(targetClassName, classNode);
     }
 
     @Override
