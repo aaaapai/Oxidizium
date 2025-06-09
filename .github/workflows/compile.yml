@@ -12,7 +12,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build x86
-      run: cargo build -r
+      run: |
+        cd native
+        cargo build -r
     - name: Rename
       run: mv target/release/liboxidizium.so liboxidizium_linux_x86.so
     - name: Upload
@@ -31,7 +33,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build arm
-      run: cargo build -r
+      run: |
+        cd native
+        cargo build -r
     - name: Rename
       run: mv target/release/liboxidizium.so liboxidizium_linux_arm64.so
     - name: Upload
@@ -45,7 +49,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build x86
-      run: cargo build -r
+      run: |
+        cd native
+        cargo build -r
     - name: Rename
       run: mv target/release/oxidizium.dll oxidizium_windows_x86.dll
     - name: Upload
@@ -60,7 +66,9 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions-rust-lang/setup-rust-toolchain@v1
     - name: Build arm
-      run: cargo build -r
+      run: |
+        cd native
+        cargo build -r
     - name: Rename
       run: mv target/release/oxidizium.dll oxidizium_windows_arm64.dll
     - name: Upload
@@ -74,7 +82,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build x86
-      run: cargo build -r
+      run: |
+        cd native
+        cargo build -r
     - name: Rename
       run: mv target/release/liboxidizium.dylib liboxidizium_mac_x86.dylib
     - name: Upload
@@ -88,7 +98,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build arm
-      run: cargo build -r
+      run: |
+        cd native
+        cargo build -r
     - name: Rename
       run: mv target/release/liboxidizium.dylib liboxidizium_mac_arm64.dylib
     - name: Upload
@@ -97,7 +109,7 @@ jobs:
         name: liboxidizium_mac_arm64.dylib
         path: liboxidizium_mac_arm64.dylib
 
-  java:
+  oxidizium:
     needs: [rust_linux_x86, rust_linux_arm, rust_windows_x86, rust_windows_arm, rust_macos_x86, rust_macos_arm]
     runs-on: ubuntu-latest
     steps:
@@ -107,8 +119,10 @@ jobs:
     - name: Download Rust binaries
       uses: actions/download-artifact@v4
       with:
-        path: /home/runner/work/Oxidizium/Oxidizium
+        path: /home/runner/work/Oxidizium/Oxidizium/oxidizium
         merge-multiple: true
+    - name: Change to Oxidizium Directory
+      run: cd oxidizium
     - name: List Files
       run: ls -a
     - name: Download Jextract
@@ -142,7 +156,9 @@ jobs:
           lib.h
         failOnError: false
     - name: Make Gradlew Executable
-      run: chmod +x gradlew
+      run: |
+        cd ..
+        chmod +x gradlew
     - name: Validate the Gradle Wrapper
       uses: gradle/actions/wrapper-validation@v4
     - name: Setup JDK
@@ -151,12 +167,24 @@ jobs:
         distribution: 'temurin'
         java-version: 22
     - name: Hash Natives
-      run: ./gradlew hashLib --no-daemon
-    - name: Build with Gradle
-      run: ./gradlew build --no-daemon
-    - name: Capture build artifacts
+      run: ./gradlew :oxidizium:hashLib --no-daemon
+    - name: Build Oxidizium with Gradle
+      run: ./gradlew :testMod:build --no-daemon
+    - name: Upload Oxidizium
       uses: actions/upload-artifact@v4
       with:
         name: Oxidizium
-        path: build/libs/
+        path: |
+          oxidizium/build/libs/*.jar
+          !oxidizium/build/libs/*-sources.jar
+
+    - name: Upload Oxidizium Tester
+      uses: actions/upload-artifact@v4
+      with:
+        name: Oxidizium-Tester
+        path: |
+          testMod/build/libs/*.jar
+          !testMod/build/libs/*-sources.jar
+
+
    

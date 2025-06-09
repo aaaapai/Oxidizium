@@ -1,5 +1,6 @@
 package com.github.tatercertified.oxidizium.mixin;
 
+import com.github.tatercertified.oxidizium.utils.annotation.annotation.*;
 import com.github.tatercertified.rust.lib_h;
 import com.moulberry.mixinconstraints.annotations.IfBoolean;
 import net.minecraft.util.math.MathHelper;

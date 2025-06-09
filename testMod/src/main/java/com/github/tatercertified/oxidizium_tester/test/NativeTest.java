@@ -1,7 +1,7 @@
 package com.github.tatercertified.oxidizium_tester.test;
 
+import com.github.tatercertified.oxidizium.utils.annotation.annotation.*;
 import com.github.tatercertified.oxidizium_tester.OxidiziumTester;
-import com.github.tatercertified.oxidizium_tester.annotation.*;
 import com.github.tatercertified.oxidizium_tester.utils.MixinCloner;
 import imgui.type.ImInt;
 import net.minecraft.util.math.MathHelper;

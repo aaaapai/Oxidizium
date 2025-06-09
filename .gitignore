@@ -1,18 +1,27 @@
-/target
-
 .qodo
 /jextract-22 - Shortcut.lnk
 
 *.lock
 /build
 /.idea
-/.gradle
 /.vs
-/run
+/.gradle
 
-.jextract_path_cache
-lib.h
 /oxidizium/src/main/java/com/github/tatercertified/rust
+/oxidizium/build
+/oxidizium/.gradle
+
+/testMod/build
+/testMod/.gradle
+
+/native/lib.h
+/native/target
+/native/Cargo.lock
+
 *.dll
+*.so
+*.dylib
+
 .jdk_path_cache
+.jextract_path_cache
 *.hash
