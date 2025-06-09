@@ -84,7 +84,7 @@ tasks.register('runJextract') {
                     '--output', outputDir.asFile.absolutePath,
                     '--target-package', 'com.github.tatercertified.rust',
                     '--library', 'oxidizium',
-                    'oxidizium/lib.h'
+                    'lib.h'
         }
     }
 }
