@@ -119,25 +119,8 @@ jobs:
       with:
         path: /home/runner/work/Oxidizium/Oxidizium
         merge-multiple: true
-    - name: Download Jextract
-      run: |
-        wget https://download.java.net/java/early_access/jextract/22/6/openjdk-22-jextract+6-47_linux-x64_bin.tar.gz
-        mv openjdk-22-jextract+6-47_linux-x64_bin.tar.gz jextract.tar.gz
-        tar -xvzf jextract.tar.gz
-    - name: Jextract
-      run: |
-        jextract-22/bin/jextract --include-dir / --output oxidizium/src/main/java --target-package com.github.tatercertified.rust --library oxidizium lib.h
-        sed -i 's/Linker.Option.critical(false)/Linker.Option.critical(true)/' oxidizium/src/main/java/com/github/tatercertified/rust/lib_h.java
-        sed -i 's/public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);/public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(true));/' oxidizium/src/main/java/com/github/tatercertified/rust/lib_h.java
-    - name: Move Binaries
-      run: |
-        mv liboxidizium_mac_arm64.dylib oxidizium/src/main/resources/liboxidizium_mac_arm64.dylib
-        mv liboxidizium_mac_x86.dylib oxidizium/src/main/resources/liboxidizium_mac_x86.dylib
-        mv liboxidizium_linux_arm64.so oxidizium/src/main/resources/liboxidizium_linux_arm64.so
-        mv liboxidizium_linux_x86.so oxidizium/src/main/resources/liboxidizium_linux_x86.so
-        mv oxidizium_windows_arm64.dll oxidizium/src/main/resources/oxidizium_windows_arm64.dll
-        mv oxidizium_windows_x86.dll oxidizium/src/main/resources/oxidizium_windows_x86.dll
-    - name: Remove Binaries
+
+    - name: Remove Artifact Binaries
       uses: geekyeggo/delete-artifact@v5
       with:
         name: |
@@ -149,6 +132,7 @@ jobs:
           oxidizium_windows_x86.dll
           lib.h
         failOnError: false
+
     - name: Make Gradlew Executable
       run: chmod +x gradlew
     - name: Validate the Gradle Wrapper
@@ -158,10 +142,10 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: 22
-    - name: Hash Natives
-      run: ./gradlew :oxidizium:hashLib --no-daemon
-    - name: Build Oxidizium with Gradle
+
+    - name: Compile Oxidizium Projects
       run: ./gradlew :testMod:build --no-daemon
+
     - name: Upload Oxidizium
       uses: actions/upload-artifact@v4
       with:

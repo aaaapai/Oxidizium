@@ -1,0 +1,211 @@
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.security.MessageDigest
+
+plugins {
+    id 'fabric-loom' version '1.10-SNAPSHOT' apply false
+}
+
+subprojects {
+    apply plugin: 'fabric-loom'
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+
+    dependencies {
+        // To change the versions see the gradle.properties file
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+        modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+        include(implementation 'com.github.Tater-Certified:MixinConstraints:4856759a06')
+    }
+}
+
+// - - - - Tasks - - - - \\
+
+def jextractUrl = 'https://download.java.net/java/early_access/jextract/22/6/openjdk-22-jextract+6-47_linux-x64_bin.tar.gz'
+def jextractTar = layout.buildDirectory.file("jextract/jextract.tar.gz")
+def jextractExtractDir = layout.buildDirectory.dir("jextract/jextract-22")
+def outputDir = layout.projectDirectory.dir("oxidizium/src/main/java")
+
+tasks.register('downloadJextract') {
+    outputs.file(jextractTar)
+
+    doLast {
+        def tarFile = jextractTar.get().asFile
+        if (tarFile.exists()) {
+            println "Jextract archive already downloaded."
+        } else {
+            println "Downloading Jextract..."
+            def uri = new URI(jextractUrl)
+            def inputStream = uri.toURL().openStream()
+            Files.createDirectories(tarFile.parentFile.toPath())
+            Files.copy(inputStream, tarFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            println "Jextract downloaded successfully."
+        }
+    }
+}
+
+tasks.register('extractJextract') {
+    dependsOn 'downloadJextract'
+    outputs.dir(jextractExtractDir)
+
+    doLast {
+        def extractDirFile = jextractExtractDir.get().asFile
+        if (extractDirFile.exists() && extractDirFile.listFiles()?.length > 0) {
+            println "Jextract already extracted."
+        } else {
+            println "Extracting Jextract..."
+            copy {
+                from tarTree(resources.gzip(jextractTar.get().asFile))
+                into extractDirFile.parentFile
+            }
+            println "Extraction complete."
+        }
+    }
+}
+
+tasks.register('runJextract') {
+    dependsOn 'extractJextract'
+    inputs.file("oxidizium/lib.h")
+    outputs.dir(outputDir)
+
+    doLast {
+        println "Running Jextract..."
+
+        def jextractBin = jextractExtractDir.get().file("bin/jextract").asFile
+
+        exec {
+            commandLine jextractBin.absolutePath,
+                    '--include-dir', '/',
+                    '--output', outputDir.asFile.absolutePath,
+                    '--target-package', 'com.github.tatercertified.rust',
+                    '--library', 'oxidizium',
+                    'oxidizium/lib.h'
+        }
+    }
+}
+
+tasks.register('modifyGeneratedJava') {
+    dependsOn 'runJextract'
+
+    doLast {
+        println "Modifying generated Java file..."
+        def generatedFile = file("oxidizium/src/main/java/com/github/tatercertified/rust/lib_h.java")
+
+        if (generatedFile.exists()) {
+            def text = generatedFile.text
+            text = text.replaceAll(
+                    'Linker\\.Option\\.critical\\(false\\)',
+                    'Linker.Option.critical(true)'
+            )
+            text = text.replaceAll(
+                    'public static final MethodHandle HANDLE = Linker\\.nativeLinker\\(\\)\\.downcallHandle\\(ADDR, DESC\\);',
+                    'public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC, Linker.Option.critical(true));'
+            )
+            generatedFile.text = text
+        } else {
+            throw new GradleException("Generated Java file not found: ${generatedFile}")
+        }
+    }
+}
+
+// Main jextract task
+tasks.register('jextract') {
+    dependsOn 'modifyGeneratedJava'
+}
+
+// Main moveBinaries task
+tasks.register('moveBinaries') {
+    doLast {
+        def resourceDir = file('oxidizium/src/main/resources')
+
+        def filesToMove = [
+                'liboxidizium_mac_arm64.dylib',
+                'liboxidizium_mac_x86.dylib',
+                'liboxidizium_linux_arm64.so',
+                'liboxidizium_linux_x86.so',
+                'oxidizium_windows_arm64.dll',
+                'oxidizium_windows_x86.dll'
+        ]
+
+        filesToMove.each { fileName ->
+            def sourceFile = file(fileName)
+
+            if (sourceFile.exists()) {
+                if (!resourceDir.exists()) {
+                    resourceDir.mkdirs()
+                }
+                copy {
+                    from sourceFile
+                    into resourceDir
+                }
+                if (!sourceFile.delete()) {
+                    throw new GradleException("Failed to delete ${sourceFile}")
+                }
+                println "Moved ${fileName} to ${resourceDir}"
+            } else {
+                println "File not found: ${fileName}, skipping."
+            }
+        }
+    }
+}
+
+tasks.register('hashLib') {
+    def possibleFiles = [
+            "liboxidizium_linux_x86",
+            "liboxidizium_linux_arm64",
+            "oxidizium_windows_x86",
+            "oxidizium_windows_arm64",
+            "liboxidizium_mac_x86",
+            "liboxidizium_mac_arm64"
+    ]
+    def libEndings = [
+            ".so",
+            ".dll",
+            ".dylib"
+    ]
+
+    doLast {
+        for (int i = 0; i < possibleFiles.size(); i++) {
+            def fileName = possibleFiles[i]
+            def fileEnding = libEndings[i/2]
+            def fileFullName = fileName + fileEnding
+            def f = file("oxidizium/src/main/resources/${fileFullName}".toString())
+            if (f.exists()) {
+                def outputFile = file("oxidizium/src/main/resources/${fileName}.hash".toString())
+
+                // Read file bytes
+                byte[] fileBytes = f.bytes
+
+                // Generate SHA-256 hash
+                MessageDigest digest = MessageDigest.getInstance("SHA-256")
+                byte[] hashBytes = digest.digest(fileBytes)
+
+                // Convert to hex string
+                StringBuilder hexString = new StringBuilder()
+                for (byte b : hashBytes) {
+                    String hex = Integer.toHexString(0xff & b)
+                    if (hex.length() == 1) hexString.append('0')
+                    hexString.append(hex)
+                }
+
+                // Write the hash to output file
+                outputFile.text = hexString.toString()
+
+                println "Hashed ${f.name} -> ${outputFile.name}"
+            }
+        }
+    }
+}
+
+// - - - - Task Configuration - - - - \\
+
+tasks.named('moveBinaries').orNull.dependsOn('jextract')
+tasks.named('hashLib').orNull.dependsOn('moveBinaries')
+project(':testMod').tasks.named('build').configure {
+    dependsOn tasks.named('hashLib')
+}

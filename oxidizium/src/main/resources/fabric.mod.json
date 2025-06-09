@@ -10,9 +10,6 @@
   "icon": "assets/oxidizium/icon.png",
   "environment": "*",
   "entrypoints": {
-    "client": [
-      "com.github.tatercertified.oxidizium_tester.OxidiziumClient"
-    ],
     "main": [
       "com.github.tatercertified.oxidizium.Oxidizium"
     ],
