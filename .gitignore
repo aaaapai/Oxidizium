@@ -3,19 +3,16 @@
 .qodo
 /jextract-22 - Shortcut.lnk
 
-.qodo
 *.lock
 /build
-/.idea
 /.idea
 /.gradle
 /.vs
 /run
 
-.qodo
 .jextract_path_cache
 lib.h
-/src/main/java/com/github/tatercertified/rust
+/oxidizium/src/main/java/com/github/tatercertified/rust
 *.dll
 .jdk_path_cache
 *.hash
