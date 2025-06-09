@@ -70,7 +70,7 @@ tasks.register('extractJextract') {
 
 tasks.register('runJextract') {
     dependsOn 'extractJextract'
-    inputs.file("oxidizium/lib.h")
+    inputs.file("lib.h")
     outputs.dir(outputDir)
 
     doLast {
