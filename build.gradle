@@ -26,7 +26,20 @@ subprojects {
 
 // - - - - Tasks - - - - \\
 
-def jextractUrl = 'https://download.java.net/java/early_access/jextract/22/6/openjdk-22-jextract+6-47_linux-x64_bin.tar.gz'
+def jextractUrl
+
+def os = org.gradle.internal.os.OperatingSystem.current()
+
+if (os.isWindows()) {
+    jextractUrl = 'https://download.java.net/java/early_access/jextract/22/6/openjdk-22-jextract+6-47_windows-x64_bin.tar.gz'
+} else if (os.isLinux()) {
+    jextractUrl = 'https://download.java.net/java/early_access/jextract/22/6/openjdk-22-jextract+6-47_linux-x64_bin.tar.gz'
+} else if (os.isMacOsX()) {
+    jextractUrl = 'https://download.java.net/java/early_access/jextract/22/6/openjdk-22-jextract+6-47_macos-x64_bin.tar.gz'
+} else {
+    throw new GradleException("Unsupported OS for JExtract")
+}
+
 def jextractTar = layout.buildDirectory.file("jextract/jextract.tar.gz")
 def jextractExtractDir = layout.buildDirectory.dir("jextract/jextract-22")
 def outputDir = layout.projectDirectory.dir("oxidizium/src/main/java")
@@ -68,29 +81,30 @@ tasks.register('extractJextract') {
     }
 }
 
-tasks.register('runJextract') {
-    dependsOn 'extractJextract'
+tasks.register('runJextract', Exec) {
+    dependsOn tasks.named('extractJextract')
     inputs.file("lib.h")
     outputs.dir(outputDir)
-
-    doLast {
-        println "Running Jextract..."
-
-        def jextractBin = jextractExtractDir.get().file("bin/jextract").asFile
-
-        exec {
-            commandLine jextractBin.absolutePath,
-                    '--include-dir', '/',
-                    '--output', outputDir.asFile.absolutePath,
-                    '--target-package', 'com.github.tatercertified.rust',
-                    '--library', 'oxidizium',
-                    'lib.h'
-        }
+    def jextractBin = jextractExtractDir.get().file("bin/jextract").asFile
+    if (os.isWindows()) {
+        commandLine jextractBin.absolutePath + '.bat',
+                '--include-dir', '/',
+                '--output', outputDir.asFile.absolutePath,
+                '--target-package', 'com.github.tatercertified.rust',
+                '--library', 'oxidizium',
+                'lib.h'
+    } else {
+        commandLine jextractBin.absolutePath,
+                '--include-dir', '/',
+                '--output', outputDir.asFile.absolutePath,
+                '--target-package', 'com.github.tatercertified.rust',
+                '--library', 'oxidizium',
+                'lib.h'
     }
 }
 
 tasks.register('modifyGeneratedJava') {
-    dependsOn 'runJextract'
+    dependsOn tasks.named('runJextract')
 
     doLast {
         println "Modifying generated Java file..."
@@ -196,6 +210,64 @@ tasks.register('hashLib') {
     }
 }
 
+tasks.register('rust', Exec) {
+    workingDir 'native'
+    commandLine 'cargo', 'build', '-r'
+}
+
+tasks.register('postRust') {
+    dependsOn tasks.named('rust')
+    doLast {
+        def buildDir = file('native/target/release')
+        def headerFile = file('native/lib.h')
+
+        // Move lib.h
+        if (headerFile.exists()) {
+            copy {
+                from headerFile
+                into projectDir
+            }
+            if (!headerFile.delete()) {
+                throw new GradleException("Failed to delete ${headerFile}")
+            }
+            println "Moved lib.h to project root."
+        } else {
+            println "lib.h not found, skipping."
+        }
+
+        def rustLibs = buildDir.listFiles(new FilenameFilter() {
+            boolean accept(File dir, String name) {
+                name.endsWith('.dll') || name.endsWith('.so') || name.endsWith('.dylib')
+            }
+        })
+
+        if (rustLibs && rustLibs.length > 0) {
+            rustLibs.each { libFile ->
+                copy {
+                    from libFile
+                    into projectDir
+                }
+                if (!libFile.delete()) {
+                    throw new GradleException("Failed to delete ${libFile}")
+                }
+                println "Moved ${libFile.name} to project root."
+            }
+        } else {
+            println "No Rust libraries found in ${buildDir}."
+        }
+    }
+}
+
+tasks.register('compileLocally') {
+    dependsOn tasks.named('postRust')
+    dependsOn tasks.named('devOxidizumBuild')
+}
+
+tasks.register('devOxidizumBuild') {
+    dependsOn project(':testMod').tasks.named('build')
+    mustRunAfter 'postRust'
+}
+
 // - - - - Task Configuration - - - - \\
 
 tasks.named('moveBinaries').orNull.dependsOn('modifyGeneratedJava')
@@ -205,6 +277,7 @@ project(':testMod').tasks.named('build').configure {
 }
 project(':oxidizium').tasks.named('build').configure {
     mustRunAfter tasks.named('hashLib')
+    shouldRunAfter tasks.named('postRust')
 }
 project(':oxidizium').tasks.named('compileJava').configure {
     mustRunAfter tasks.named('runJextract')

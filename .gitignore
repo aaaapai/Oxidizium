@@ -9,9 +9,11 @@
 /oxidizium/src/main/java/com/github/tatercertified/rust
 /oxidizium/build
 /oxidizium/.gradle
+/oxidizium/run
 
 /testMod/build
 /testMod/.gradle
+/testMod/run
 
 /native/lib.h
 /native/target
@@ -24,3 +26,4 @@
 .jdk_path_cache
 .jextract_path_cache
 *.hash
+*.h
