@@ -204,5 +204,8 @@ project(':testMod').tasks.named('build').configure {
     dependsOn tasks.named('hashLib')
 }
 project(':oxidizium').tasks.named('build').configure {
-    dependsOn tasks.named('hashLib')
+    mustRunAfter tasks.named('hashLib')
+}
+project(':oxidizium').tasks.named('compileJava').configure {
+    mustRunAfter tasks.named('runJextract')
 }
