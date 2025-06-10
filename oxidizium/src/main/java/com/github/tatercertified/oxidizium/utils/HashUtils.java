@@ -1,5 +1,6 @@
 package com.github.tatercertified.oxidizium.utils;
 
+import com.github.tatercertified.oxidizium.Config;
 import com.github.tatercertified.oxidizium.Oxidizium;
 
 import java.io.*;
@@ -15,7 +16,9 @@ public final class HashUtils {
         String correctHash = getLibHash(currentOSLibName);
         String presentHash = getFileHash(libOxidizium);
         if (!correctHash.equals(presentHash)) {
-            Oxidizium.LOGGER.info("Outdated Oxidizium Binary Found. Updating...");
+            if (Config.getInstance().debug()) {
+                Oxidizium.LOGGER.info("Outdated Oxidizium Binary Found. Updating...");
+            }
             return false;
         }
         return true;

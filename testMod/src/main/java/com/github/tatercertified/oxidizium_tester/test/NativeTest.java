@@ -1,5 +1,7 @@
 package com.github.tatercertified.oxidizium_tester.test;
 
+import com.github.tatercertified.oxidizium.Config;
+import com.github.tatercertified.oxidizium.utils.MappingTranslator;
 import com.github.tatercertified.oxidizium.utils.annotation.annotation.*;
 import com.github.tatercertified.oxidizium_tester.OxidiziumTester;
 import com.github.tatercertified.oxidizium_tester.utils.MixinCloner;
@@ -69,13 +71,15 @@ public class NativeTest {
             TestingGUI.setCurrentClass(vanillaClass.getSimpleName());
             for (int i = 0; i < runs; i++) {
                 TestingGUI.setCurrentRun(i);
+                String intermediaryClassName = MappingTranslator.toIntermediary(vanillaClass);
                 for (Method method : mixin.getDeclaredMethods()) {
                     try {
-                        Method vanillaMethod = vanillaClass.getMethod(method.getName(), method.getParameterTypes());
+                        String remappedMethodName = MappingTranslator.remapMethodName(intermediaryClassName, method.getName(), method.getReturnType(), method.getParameterTypes());
+                        Method vanillaMethod = vanillaClass.getMethod(remappedMethodName, method.getParameterTypes());
                         if (returnFilter == null || Arrays.stream(returnFilter).anyMatch(clazz -> clazz == method.getReturnType())) {
-                            TestingGUI.setCurrentMethod(formatMethod(vanillaMethod));
+                            TestingGUI.setCurrentMethod(formatMethod(remappedMethodName, vanillaMethod));
                             try {
-                                invokeAndTest(method, vanillaMethod);
+                                invokeAndTest(method, vanillaMethod, remappedMethodName);
                             } catch (Exception e) {
                                 String error;
                                 if (e instanceof InvocationTargetException exception) {
@@ -83,7 +87,7 @@ public class NativeTest {
                                 } else {
                                     error = e.toString();
                                 }
-                                TestingGUI.addError(formatMethod(vanillaMethod), false, error);
+                                TestingGUI.addError(formatMethod(remappedMethodName, vanillaMethod), false, error);
                             }
                         }
                     } catch (NoSuchMethodException _) {
@@ -97,10 +101,12 @@ public class NativeTest {
 
     private static int getTotalTestedMethods(Class<?> clazz, Class<?> vanillaClass, @Nullable Class<?>... returnFilter) {
         int count = 0;
+        String intermediaryClassName = MappingTranslator.toIntermediary(vanillaClass);
         for (Method method : clazz.getDeclaredMethods()) {
             if (Arrays.stream(returnFilter).anyMatch(clazz1 -> clazz1 == method.getReturnType())) {
                 try {
-                    vanillaClass.getMethod(method.getName(), method.getParameterTypes());
+                    String remappedMethodName = MappingTranslator.remapMethodName(intermediaryClassName, method.getName(), method.getReturnType(), method.getParameterTypes());
+                    vanillaClass.getMethod(remappedMethodName, method.getParameterTypes());
                 } catch (NoSuchMethodException e) {
                     continue;
                 }
@@ -110,9 +116,9 @@ public class NativeTest {
         return count;
     }
 
-    private static String formatMethod(Method method) {
+    private static String formatMethod(String remappedMethodName, Method method) {
         StringBuilder builder = new StringBuilder();
-        builder.append(method.getName()).append("(");
+        builder.append(remappedMethodName).append("(");
 
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
@@ -126,7 +132,7 @@ public class NativeTest {
         return builder.toString();
     }
 
-    private static void invokeAndTest(Method nativeMethod, Method javaMethod) throws Exception {
+    private static void invokeAndTest(Method nativeMethod, Method javaMethod, String remappedMethodName) throws Exception {
         Class<?>[] parameterTypes = nativeMethod.getParameterTypes();
         Object[] args = new Object[parameterTypes.length];
 
@@ -144,17 +150,13 @@ public class NativeTest {
         Object nativeResult = nativeMethod.invoke(null, args);
         Object javaResult = javaMethod.invoke(null, args);
 
-        boolean resultsEqual = areResultsEquivalent(nativeResult, javaResult, nativeMethod.getReturnType(), javaMethod);
-
-        if (!resultsEqual) {
-            TestingGUI.addError(formatMethod(javaMethod), false, nativeResult + " != " + javaResult);
-        }
+        boolean resultsEqual = areResultsEquivalent(nativeResult, javaResult, nativeMethod.getReturnType(), javaMethod, remappedMethodName);
 
         assertTrue(resultsEqual,
                 String.format("\u001B[31m %s is invalid: %s != %s \u001B[0m", nativeMethod.getName(), nativeResult, javaResult));
     }
 
-    private static boolean areResultsEquivalent(Object nativeResult, Object javaResult, Class<?> returnType, Method vanillaMethod) {
+    private static boolean areResultsEquivalent(Object nativeResult, Object javaResult, Class<?> returnType, Method vanillaMethod, String remappedMethodName) {
         boolean acceptable;
         boolean exact = true;
         if (returnType.equals(float.class)) {
@@ -170,7 +172,9 @@ public class NativeTest {
         }
 
         if (acceptable && !exact) {
-            TestingGUI.addError(formatMethod(vanillaMethod), true, nativeResult + " != " + javaResult);
+            TestingGUI.addError(formatMethod(remappedMethodName, vanillaMethod), true, "[Native] " + nativeResult + " != [Java] " + javaResult);
+        } else if (!acceptable) {
+            TestingGUI.addError(formatMethod(remappedMethodName, vanillaMethod), false, "[Native] " + nativeResult + " != [Java] " + javaResult);
         }
 
         return acceptable;
@@ -215,7 +219,9 @@ public class NativeTest {
             // Only min identified, assume last parameter as max
             maxIndex = parameters.length - 1;
             if (((Number) args[minIndex]).doubleValue() > ((Number) args[maxIndex]).doubleValue()) {
-                OxidiziumTester.TEST_LOGGER.info("Assuming last parameter as 'max' and swapping with 'min'");
+                if (Config.getInstance().debug()) {
+                    OxidiziumTester.TEST_LOGGER.info("Assuming last parameter as 'max' and swapping with 'min'");
+                }
 
                 Object temp = args[minIndex];
                 args[minIndex] = args[maxIndex];
@@ -247,7 +253,7 @@ public class NativeTest {
     }
 
     private static void assertTrue(boolean bool, String ifFailed) {
-        if (!bool) {
+        if (!bool && Config.getInstance().debug()) {
             OxidiziumTester.TEST_LOGGER.error(ifFailed);
         }
     }

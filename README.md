@@ -41,4 +41,4 @@ Run `gradlew compileLocally` to compile the mod locally. This will build `Oxidiz
 x86_64 and Linux x86_64, but should work with macOS x86_64 and aarch64 (via Rosetta).
 ### Running in Dev Environment
 To run the `Oxidizium` mod, use `gradlew :oxidizium:runClient` or `gradlew :oxidizium:runServer`<p>
-To run the `Oxidizium-Test` mod, compile the mod, put it into `oxidizium/run/mods` folder and then run gradlew command above
+To run the `Oxidizium-Test` mod, use `gradlew :testMod:runClient`. This will automatically enable the testing GUI

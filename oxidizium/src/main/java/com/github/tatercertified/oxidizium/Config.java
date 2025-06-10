@@ -12,73 +12,77 @@ import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 import java.util.Properties;
 
-public record Config(String version, boolean test, boolean reducedMemoryUsage, boolean enhancedLithiumSupport) {
+public record Config(String version, boolean debug, boolean test, boolean reducedMemoryUsage, boolean enhancedLithiumSupport) {
     private static Config instance;
+    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("oxidizium.properties");
     public static void init() {
-        final Path config = FabricLoader.getInstance().getConfigDir().resolve("oxidizium.properties");
         final Properties properties = new Properties();
         final String configVerKey = "config-version";
         final String configVer = "1.0";
 
-        if (Files.notExists(config)) {
-            try {
-                storeConfig(config, configVer, properties);
-            } catch (IOException e) {
-                Oxidizium.LOGGER.error("Config storing failed", e);
-            }
+        if (Files.notExists(CONFIG_PATH)) {
+            fillDefaults(configVer, properties);
         } else {
             try {
-                loadConfig(config, properties);
+                loadConfig(properties);
             } catch (IOException e) {
-                Oxidizium.LOGGER.error("Config creation failed", e);
+                if (Config.getInstance().debug()) {
+                    Oxidizium.LOGGER.error("Config creation failed", e);
+                }
             }
 
             if (!(Objects.equals(properties.getProperty(configVerKey), configVer))) {
-                properties.setProperty(configVerKey, configVer);
-                try {
-                    storeConfig(config, configVer, properties);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                fillDefaults(configVer, properties);
             } else {
                 parse(configVer, properties);
             }
         }
     }
 
-    private static void storeConfig(Path config, String configVer, Properties properties) throws IOException {
-        try (OutputStream output = Files.newOutputStream(config, StandardOpenOption.CREATE)) {
-            fillDefaults(configVer, properties);
+    private static void storeConfig(String configVer, Properties properties) throws IOException {
+        try (OutputStream output = Files.newOutputStream(CONFIG_PATH, StandardOpenOption.CREATE)) {
             properties.store(output, null);
         }
         parse(configVer, properties);
     }
 
     private static void fillDefaults(String configVer, Properties properties) {
-        checkProperty("config-version", configVer, properties);
-        checkProperty("test-mode", "false", properties);
-        checkProperty("reduced-memory-usage", "true", properties);
-        checkProperty("enhanced-lithium-compat", "true", properties);
-    }
-
-    private static void checkProperty(String key, String defaultValue, Properties properties) {
-        if (!properties.containsKey(key)) {
-            properties.setProperty(key, defaultValue);
+        if (checkProperty("config-version", configVer, properties) ||
+                checkProperty("debug", "false", properties) ||
+                checkProperty("test-mode", "false", properties) ||
+                checkProperty("reduced-memory-usage", "true", properties) ||
+                checkProperty("enhanced-lithium-compat", "true", properties)) {
+            try {
+                storeConfig(configVer, properties);
+            } catch (IOException e) {
+                if (Config.getInstance().debug()) {
+                    Oxidizium.LOGGER.error("Config storing failed", e);
+                }
+            }
         }
     }
 
-    private static void loadConfig(Path config, Properties properties) throws IOException {
-        try (InputStream input = Files.newInputStream(config)) {
+    private static boolean checkProperty(String key, String defaultValue, Properties properties) {
+        boolean missingKey = !properties.containsKey(key);
+        if (missingKey) {
+            properties.setProperty(key, defaultValue);
+        }
+        return missingKey;
+    }
+
+    private static void loadConfig(Properties properties) throws IOException {
+        try (InputStream input = Files.newInputStream(CONFIG_PATH)) {
             properties.load(input);
         }
     }
 
     private static void parse(String configVer, Properties properties) {
         fillDefaults(configVer, properties);
+        boolean debug = Boolean.parseBoolean(properties.getProperty("debug"));
         boolean testingMode = Boolean.parseBoolean(properties.getProperty("test-mode"));
         boolean reducedMemUse = Boolean.parseBoolean(properties.getProperty("reduced-memory-usage"));
         boolean enhancedLithiumCompat = Boolean.parseBoolean(properties.getProperty("enhanced-lithium-compat"));
-        instance = new Config(configVer, testingMode, reducedMemUse, enhancedLithiumCompat);
+        instance = new Config(configVer, debug, testingMode, reducedMemUse, enhancedLithiumCompat);
     }
 
     public static Config getInstance() {

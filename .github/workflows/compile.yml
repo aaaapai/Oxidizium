@@ -153,6 +153,7 @@ jobs:
         path: |
           oxidizium/build/libs/*.jar
           !oxidizium/build/libs/*-sources.jar
+        compression-level: 0
 
     - name: Upload Oxidizium Tester
       uses: actions/upload-artifact@v4
@@ -161,3 +162,4 @@ jobs:
         path: |
           testMod/build/libs/*.jar
           !testMod/build/libs/*-sources.jar
+        compression-level: 0

@@ -1,5 +1,6 @@
 package com.github.tatercertified.oxidizium.utils;
 
+import com.github.tatercertified.oxidizium.Config;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 import org.slf4j.Logger;
@@ -16,7 +17,9 @@ public class FieldStripper {
     public static final Logger STRIPPER_LOGGER = LoggerFactory.getLogger("FieldStripper");
 
     public static void stripFieldsWithClassNode(String className, ClassNode node, String[][] fieldsToStrip) {
-        STRIPPER_LOGGER.info("Beginning Stripping Process");
+        if (Config.getInstance().debug()) {
+            STRIPPER_LOGGER.info("Beginning Stripping Process");
+        }
         List<String> fields = new ArrayList<>();
 
         for (String[] field : fieldsToStrip) {
@@ -25,7 +28,9 @@ public class FieldStripper {
 
         node.fields.removeIf(field -> {
             if (fields.contains(field.name)) {
-                STRIPPER_LOGGER.info("Stripped field: {}", field.name);
+                if (Config.getInstance().debug()) {
+                    STRIPPER_LOGGER.info("Stripped field: {}", field.name);
+                }
                 return true;
             }
             return false;
@@ -35,7 +40,9 @@ public class FieldStripper {
         stripStaticFieldInitializers(node, fields, internalName);
         removeStaticFieldUsagesInClinit(node, fields, internalName);
 
-        STRIPPER_LOGGER.info("Finished Stripping Process");
+        if (Config.getInstance().debug()) {
+            STRIPPER_LOGGER.info("Finished Stripping Process");
+        }
     }
 
     private static void stripStaticFieldInitializers(ClassNode classNode, List<String> strippedFieldNames, String internalClassName) {
@@ -51,7 +58,9 @@ public class FieldStripper {
                         fieldInsn.owner.equals(internalClassName) &&
                         strippedFieldNames.contains(fieldInsn.name)) {
 
-                    STRIPPER_LOGGER.info("Stripping static field initializer: {}", fieldInsn.name);
+                    if (Config.getInstance().debug()) {
+                        STRIPPER_LOGGER.info("Stripping static field initializer: {}", fieldInsn.name);
+                    }
 
                     AbstractInsnNode start = insn.getPrevious();
 
@@ -133,7 +142,9 @@ public class FieldStripper {
                         }
                     }
 
-                    STRIPPER_LOGGER.info("Removing usage of static field '{}'", fieldInsn.name);
+                    if (Config.getInstance().debug()) {
+                        STRIPPER_LOGGER.info("Removing usage of static field '{}'", fieldInsn.name);
+                    }
                     for (AbstractInsnNode toDel : toRemove) {
                         insns.remove(toDel);
                     }
