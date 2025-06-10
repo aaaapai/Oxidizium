@@ -161,6 +161,3 @@ jobs:
         path: |
           testMod/build/libs/*.jar
           !testMod/build/libs/*-sources.jar
-
-
-   
