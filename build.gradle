@@ -113,12 +113,6 @@ tasks.register('modifyGeneratedJava') {
     }
 }
 
-// Main jextract task
-tasks.register('jextract') {
-    dependsOn 'modifyGeneratedJava'
-}
-
-// Main moveBinaries task
 tasks.register('moveBinaries') {
     doLast {
         def resourceDir = file('oxidizium/src/main/resources')
@@ -204,18 +198,11 @@ tasks.register('hashLib') {
 
 // - - - - Task Configuration - - - - \\
 
-tasks.named('moveBinaries').orNull.dependsOn('jextract')
+tasks.named('moveBinaries').orNull.dependsOn('modifyGeneratedJava')
 tasks.named('hashLib').orNull.dependsOn('moveBinaries')
 project(':testMod').tasks.named('build').configure {
     dependsOn tasks.named('hashLib')
 }
-tasks.named('moveBinaries').orNull.dependsOn('jextract')
-tasks.named('hashLib').orNull.dependsOn('moveBinaries')
 project(':oxidizium').tasks.named('build').configure {
     dependsOn tasks.named('hashLib')
 }
-/*
-project(':testMod').tasks.named('build').configure {
-    dependsOn tasks.named('hashLib')
-}
- */
