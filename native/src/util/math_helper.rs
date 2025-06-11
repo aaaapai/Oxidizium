@@ -268,7 +268,7 @@ pub extern "C" fn pack_degrees(degrees: f32) -> i8 {
 /// Converts bytes to degrees
 #[no_mangle]
 pub extern "C" fn unpack_degrees(packed_degrees: i8) -> f32 {
-    (packed_degrees as i16 * 360_i16) as f32 / 256_f32
+    (packed_degrees as i32 * 360_i32) as f32 / 256_f32
 }
 
 /// Forces degrees into +/- 180
