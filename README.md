@@ -12,7 +12,8 @@ Many more classes are planned in the future, however mostly low-level classes wi
 As of now, Oxidizium is very compatible with the majority of mods, with specific compatibility with Lithium
 
 ## Usage
-This mod **<u>requires Java 22 or above</u>**.<p>
+This mod is intended to be used server-side, but can be used on the client (with minor rendering bugs). 
+**<u>It requires Java 22 or above</u>**.<p>
 The following JVM arguments are recommended, but not *currently* required for Java 24 and below:
 ```markdown
 --enable-preview --enable-native-access=ALL-UNNAMED
@@ -38,7 +39,7 @@ The latest releases can be found on [our Discord Server](https://discord.gg/XGw3
 ### Compiling
 Run `gradlew compileLocally` to compile the mod locally. This will build `Oxidizium` and `Oxidizium-Test` in
 `oxidizium/build` and `testMod/build` respectfully. This build script has only been verified to work on Windows
-x86_64 and Linux x86_64, but should work with macOS x86_64 and aarch64 (via Rosetta).
+x86_64 and Linux x86_64, but should work with macOS x86_64 (Intel).
 ### Running in Dev Environment
 To run the `Oxidizium` mod, use `gradlew :oxidizium:runClient` or `gradlew :oxidizium:runServer`<p>
 To run the `Oxidizium-Test` mod, use `gradlew :testMod:runClient`. This will automatically enable the testing GUI

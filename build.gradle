@@ -210,7 +210,12 @@ tasks.register('hashLib') {
     }
 }
 
+tasks.register('deleteRustCache') {
+    delete('native/target')
+}
+
 tasks.register('rust', Exec) {
+    dependsOn tasks.named('deleteRustCache')
     workingDir 'native'
     commandLine 'cargo', 'build', '-r'
 }
@@ -235,26 +240,59 @@ tasks.register('postRust') {
             println "lib.h not found, skipping."
         }
 
+        // Detect OS and arch
+        def arch = System.getProperty("os.arch")
+
+        // Find Rust binary
         def rustLibs = buildDir.listFiles(new FilenameFilter() {
             boolean accept(File dir, String name) {
                 name.endsWith('.dll') || name.endsWith('.so') || name.endsWith('.dylib')
             }
         })
 
-        if (rustLibs && rustLibs.length > 0) {
-            rustLibs.each { libFile ->
-                copy {
-                    from libFile
-                    into projectDir
-                }
-                if (!libFile.delete()) {
-                    throw new GradleException("Failed to delete ${libFile}")
-                }
-                println "Moved ${libFile.name} to project root."
+        if (!rustLibs || rustLibs.length == 0) {
+            println "No Rust libraries found in ${buildDir}."
+            return
+        }
+
+        def libFile = rustLibs[0]
+
+        // Determine new name
+        def newName
+        if (os.isLinux()) {
+            if (arch.contains('64') && arch.contains('aarch')) {
+                newName = 'liboxidizium_linux_arm64.so'
+            } else {
+                newName = 'liboxidizium_linux_x86.so'
+            }
+        } else if (os.isWindows()) {
+            if (arch.contains('64') && arch.contains('aarch')) {
+                newName = 'oxidizium_windows_arm64.dll'
+            } else {
+                newName = 'oxidizium_windows_x86.dll'
+            }
+        } else if (os.isMacOsX()) {
+            if (arch.contains('64') && arch.contains('aarch')) {
+                newName = 'liboxidizium_mac_arm64.dylib'
+            } else {
+                newName = 'liboxidizium_mac_x86.dylib'
             }
         } else {
-            println "No Rust libraries found in ${buildDir}."
+            throw new GradleException("Unsupported OS for Rust library naming.")
         }
+
+        // Move and rename file
+        def destFile = new File(projectDir, newName)
+        copy {
+            from libFile
+            into projectDir
+            rename { newName }
+        }
+        if (!libFile.delete()) {
+            throw new GradleException("Failed to delete ${libFile}")
+        }
+
+        println "Moved and renamed ${libFile.name} to ${destFile.name}."
     }
 }
 

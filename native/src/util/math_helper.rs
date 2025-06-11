@@ -1,7 +1,7 @@
-use std::ffi::c_ushort;
-use std::slice;
 use once_cell::sync::Lazy;
+use std::ffi::c_ushort;
 use std::num::Wrapping;
+use std::slice;
 
 const APPROXIMATION_THRESHOLD: f32 = 1.0E-5;
 const MULTIPLY_DE_BRUIJN_BIT_POS: [i8; 32] = [
@@ -15,7 +15,6 @@ const DOUBLE_PI: f64 = std::f64::consts::PI * 2.0_f64;
 const DOUBLE_PI_F32: f32 = std::f32::consts::PI * 2.0_f32;
 const INVERSE_SQRT: u64 = 6910469410427058090;
 const PACK: f32 = 256.0_f32 / 360.0_f32;
-const UNPACK: f32 = 360.0_f32 / 256.0_f32;
 
 static SINE_TABLE: Lazy<[f32; 65536]> = Lazy::new(|| {
     let mut table = [0.0_f32; 65536];
@@ -263,13 +262,13 @@ pub extern "C" fn is_multiple_of(a: i32, b: i32) -> bool {
 /// Compacts degrees into a single byte
 #[no_mangle]
 pub extern "C" fn pack_degrees(degrees: f32) -> i8 {
-    (degrees * PACK).floor() as i8
+    floor_float(degrees * PACK) as i8
 }
 
 /// Converts bytes to degrees
 #[no_mangle]
 pub extern "C" fn unpack_degrees(packed_degrees: i8) -> f32 {
-    packed_degrees as f32 * UNPACK
+    (packed_degrees as i16 * 360_i16) as f32 / 256_f32
 }
 
 /// Forces degrees into +/- 180
@@ -352,7 +351,7 @@ pub extern "C" fn step_unwrapped_angle_towards(from: f32, to: f32, step: f32) ->
 /// ```java
 /// String str = " -123 ";
 /// char[] chars = str.toCharArray(); // UTF-16 characters
-/// 
+///
 /// // You can pass this pointer + length into Rust
 /// int result = lib_h.parse_int_utf16(chars_ptr, chars.length, 0);
 ///```
@@ -372,7 +371,8 @@ pub extern "C" fn parse_int_utf16(ptr: *const c_ushort, len: usize, fallback: i3
         let ch = u as u32;
 
         match ch {
-            48..=57 => { // '0'..='9' as u32
+            48..=57 => {
+                // '0'..='9' as u32
                 started = true;
                 match result
                     .checked_mul(10)
@@ -382,12 +382,13 @@ pub extern "C" fn parse_int_utf16(ptr: *const c_ushort, len: usize, fallback: i3
                     None => return fallback, // overflow
                 }
             }
-            45 if !started => { // '-' as u32
+            45 if !started => {
+                // '-' as u32
                 negative = true;
                 started = true;
             }
             32 | 9 if !started => continue, // allow leading space/tab
-            _ => break, // stop on invalid input
+            _ => break,                     // stop on invalid input
         }
     }
 

@@ -18,6 +18,7 @@
 /native/lib.h
 /native/target
 /native/Cargo.lock
+/native/.idea
 
 *.dll
 *.so
