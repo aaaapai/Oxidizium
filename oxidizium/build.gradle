@@ -1,10 +1,17 @@
-import java.security.MessageDigest
-
 version = project.oxidizium_version
 group = project.maven_group
 
 base {
     archivesName = project.archives_base_name
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    include(implementation 'com.github.Tater-Certified:MixinConfig:c4c71652bb')
 }
 
 processResources {
