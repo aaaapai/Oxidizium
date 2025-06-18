@@ -5,6 +5,7 @@ import com.github.tatercertified.oxidizium.utils.annotation.annotation.*;
 import com.github.tatercertified.rust.lib_h;
 import com.moulberry.mixinconstraints.annotations.IfBoolean;
 import net.minecraft.util.math.MathHelper;
+import org.apache.commons.lang3.math.Fraction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -372,11 +373,14 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     // @Config(name = "parse int", enabled = false)
+    /*
     @Overwrite
     public static int parseInt(String string, int fallback) {
         char[] chars = string.toCharArray();
         return lib_h.parse_int_utf16(MemorySegment.ofArray(chars), chars.length, fallback);
     }
+
+     */
 
     /**
      * @author QPCrummer
@@ -386,6 +390,16 @@ public class MathHelperMixin {
     @Overwrite
     public static int smallestEncompassingPowerOfTwo(int value) {
         return lib_h.smallest_encompassing_power_of_two(value);
+    }
+
+    /**
+     * @author QPCrummer
+     * @reason Implement in Rust
+     */
+    // @Config(name = "smallest square side len")
+    @Overwrite
+    public static int smallestEncompassingSquareSideLength(@PositiveOnly int value) {
+        return lib_h.smallest_encompassing_square_side_length(value);
     }
 
     /**
@@ -863,6 +877,16 @@ public class MathHelperMixin {
     @Overwrite
     public static int roundDownToMultiple(double a, int b) {
         return lib_h.round_down_to_multiple(a, b);
+    }
+
+    /**
+     * @author QPCrummer
+     * @reason Implement in Rust
+     */
+    // @Config(name = "multiply fract")
+    @Overwrite
+    public static int multiplyFraction(Fraction fraction, int multiplier) {
+        return lib_h.multiply_fraction(fraction.getNumerator(), fraction.getDenominator(), multiplier);
     }
 
     /**

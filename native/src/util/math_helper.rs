@@ -415,6 +415,12 @@ pub extern "C" fn smallest_encompassing_power_of_two(value: i32) -> i32 {
     i + 1
 }
 
+/// Gets the smallest square side length
+#[no_mangle]
+pub extern "C" fn smallest_encompassing_square_side_length(value: i32) -> i32 {
+    ceil_double((value as f64).sqrt())
+}
+
 /// Returns if the value is a power of two
 #[no_mangle]
 pub extern "C" fn is_power_of_two(value: i32) -> bool {
@@ -914,7 +920,11 @@ pub extern "C" fn round_down_to_multiple(a: f64, b: i32) -> i32 {
 
 // rotateAround
 
-// multiplyFraction
+/// Multiplies a fraction
+#[no_mangle]
+pub extern "C" fn multiply_fraction(numerator: i32, denominator: i32, multiplier: i32) -> i32 {
+    numerator * multiplier / denominator
+}
 
 /// Gradual sine function
 #[no_mangle]

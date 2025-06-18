@@ -7,6 +7,7 @@ import com.github.tatercertified.oxidizium_tester.OxidiziumTester;
 import com.github.tatercertified.oxidizium_tester.utils.MixinCloner;
 import imgui.type.ImInt;
 import net.minecraft.util.math.MathHelper;
+import org.apache.commons.lang3.math.Fraction;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -237,7 +238,8 @@ public class NativeTest {
             case "double" -> ThreadLocalRandom.current().nextDouble(-Math.PI * 4.0, Math.PI * 4.0);
             case "long" -> ThreadLocalRandom.current().nextLong(-1000, 1000);
             case "byte" -> (byte) ThreadLocalRandom.current().nextInt(-128, 127);
-            default -> throw new IllegalArgumentException("Unsupported type: " + type);
+            case "org.apache.commons.lang3.math.Fraction" -> Fraction.getFraction(ThreadLocalRandom.current().nextInt(-100, 100), ThreadLocalRandom.current().nextInt(1, 100));
+            default -> throw new IllegalArgumentException("Unsupported type: " + type.getName());
         };
     }
 
@@ -248,6 +250,7 @@ public class NativeTest {
             case "double" -> ThreadLocalRandom.current().nextDouble(lower, upper);
             case "long" -> ThreadLocalRandom.current().nextLong((long) lower, (long) upper);
             case "byte" -> (byte) ThreadLocalRandom.current().nextInt((int) lower, (int) upper);
+            case "org.apache.commons.lang3.math.Fraction" -> Fraction.getFraction(ThreadLocalRandom.current().nextDouble(lower, upper));
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         };
     }
