@@ -1,6 +1,6 @@
 package com.github.tatercertified.oxidizium.mixin;
 
-import com.github.tatercertified.mixin_config.annotations.Config;
+// import com.github.tatercertified.mixin_config.annotations.Config;
 import com.github.tatercertified.oxidizium.utils.annotation.annotation.*;
 import com.github.tatercertified.rust.lib_h;
 import com.moulberry.mixinconstraints.annotations.IfBoolean;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 
 import java.lang.foreign.MemorySegment;
 
-@Config(name = "Native Math")
+// @Config(name = "Native Math")
 @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isTestingEnabled", negate = true)
 @Mixin(MathHelper.class)
 public class MathHelperMixin {
@@ -18,7 +18,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "sin")
+    // @Config(name = "sin")
     @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isLithiumOptimizationEnabled", negate = true)
     @Overwrite
     public static float sin(float value) {
@@ -29,7 +29,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "cos")
+    // @Config(name = "cos")
     @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isLithiumOptimizationEnabled", negate = true)
     @Overwrite
     public static float cos(float value) {
@@ -40,7 +40,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "sqrt")
+    // @Config(name = "sqrt")
     @Overwrite
     public static float sqrt(@PositiveOnly float value) {
         return lib_h.sqrt_float(value);
@@ -50,7 +50,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float floor")
+    // @Config(name = "float floor")
     @Overwrite
     public static int floor(float value) {
         return lib_h.floor_float(value);
@@ -60,7 +60,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double floor")
+    // @Config(name = "double floor")
     @Overwrite
     public static int floor(double value) {
         return lib_h.floor_double(value);
@@ -70,7 +70,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double lfloor")
+    // @Config(name = "double lfloor")
     @Overwrite
     public static long lfloor(double value) {
         return lib_h.floor_long(value);
@@ -80,7 +80,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float lfloor")
+    // @Config(name = "float lfloor")
     @Overwrite
     public static float abs(float value) {
         return lib_h.abs_float(value);
@@ -90,7 +90,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "abs")
+    // @Config(name = "abs")
     @Overwrite
     public static int abs(int value) {
         return lib_h.abs_int(value);
@@ -100,7 +100,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float ceil")
+    // @Config(name = "float ceil")
     @Overwrite
     public static int ceil(float value) {
         return lib_h.ceil_float(value);
@@ -110,7 +110,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double ceil")
+    // @Config(name = "double ceil")
     @Overwrite
     public static int ceil(double value) {
         return lib_h.ceil_double(value);
@@ -120,7 +120,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "int clamp")
+    // @Config(name = "int clamp")
     @Overwrite
     public static int clamp(int value, @Min int min, @Max int max) {
         return lib_h.clamp_int(value, min, max);
@@ -130,7 +130,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "long clamp")
+    // @Config(name = "long clamp")
     @Overwrite
     public static long clamp(long value, @Min long min, @Max long max) {
         return lib_h.clamp_long(value, min, max);
@@ -140,7 +140,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float clamp")
+    // @Config(name = "float clamp")
     @Overwrite
     public static float clamp(float value, @Min float min, @Max float max) {
         return lib_h.clamp_float(value, min, max);
@@ -150,7 +150,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double clamp")
+    // @Config(name = "double clamp")
     @Overwrite
     public static double clamp(double value, @Min double min, @Max double max) {
         return lib_h.clamp_double(value, min, max);
@@ -160,7 +160,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double clamped lerp")
+    // @Config(name = "double clamped lerp")
     @Overwrite
     public static double clampedLerp(double start, double end, double delta) {
         return lib_h.clamp_lerp_double(start, end, delta);
@@ -170,7 +170,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float clamped lerp")
+    // @Config(name = "float clamped lerp")
     @Overwrite
     public static float clampedLerp(float start, float end, float delta) {
         return lib_h.clamp_lerp_float(start, end, delta);
@@ -180,7 +180,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "abs max")
+    // @Config(name = "abs max")
     @Overwrite
     public static double absMax(double a, double b) {
         return lib_h.abs_max(a, b);
@@ -190,7 +190,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "floor div")
+    // @Config(name = "floor div")
     @Overwrite
     public static int floorDiv(int dividend, @NonZero int divisor) {
         return lib_h.floor_div(dividend, divisor);
@@ -200,7 +200,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float approx eq")
+    // @Config(name = "float approx eq")
     @Overwrite
     public static boolean approximatelyEquals(float a, float b) {
         return lib_h.approximately_equals_float(a, b);
@@ -210,7 +210,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double approx eq")
+    // @Config(name = "double approx eq")
     @Overwrite
     public static boolean approximatelyEquals(double a, double b) {
         return lib_h.approximately_equals_double(a, b);
@@ -220,7 +220,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "int floor mod")
+    // @Config(name = "int floor mod")
     @Overwrite
     public static int floorMod(int dividend, @NonZero int divisor) {
         return lib_h.floor_mod_int(dividend, divisor);
@@ -230,7 +230,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float floor mod")
+    // @Config(name = "float floor mod")
     @Overwrite
     public static float floorMod(float dividend, @NonZero float divisor) {
         return lib_h.floor_mod_float(dividend, divisor);
@@ -240,7 +240,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double floor mod")
+    // @Config(name = "double floor mod")
     @Overwrite
     public static double floorMod(double dividend, @NonZero double divisor) {
         return lib_h.floor_mod_double(dividend, divisor);
@@ -250,7 +250,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "is multiple of")
+    // @Config(name = "is multiple of")
     @Overwrite
     public static boolean isMultipleOf(int a, @NonZero int b) {
         return lib_h.is_multiple_of(a, b);
@@ -260,7 +260,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "pack degrees")
+    // @Config(name = "pack degrees")
     @Overwrite
     public static byte packDegrees(float degrees) {
         return lib_h.pack_degrees(degrees);
@@ -270,7 +270,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "unpack degrees")
+    // @Config(name = "unpack degrees")
     @Overwrite
     public static float unpackDegrees(byte packedDegrees) {
         return lib_h.unpack_degrees(packedDegrees);
@@ -280,7 +280,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "int wrap degrees")
+    // @Config(name = "int wrap degrees")
     @Overwrite
     public static int wrapDegrees(int degrees) {
         return lib_h.wrap_degrees_int(degrees);
@@ -290,7 +290,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "long wrap degrees")
+    // @Config(name = "long wrap degrees")
     @Overwrite
     public static float wrapDegrees(long degrees) {
         return lib_h.wrap_degrees_long(degrees);
@@ -300,7 +300,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float wrap degrees")
+    // @Config(name = "float wrap degrees")
     @Overwrite
     public static float wrapDegrees(float degrees) {
         return lib_h.wrap_degrees_float(degrees);
@@ -310,7 +310,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double wrap degrees")
+    // @Config(name = "double wrap degrees")
     @Overwrite
     public static double wrapDegrees(double degrees) {
         return lib_h.wrap_degrees_double(degrees);
@@ -320,7 +320,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "subtract angles")
+    // @Config(name = "subtract angles")
     @Overwrite
     public static float subtractAngles(float start, float end) {
         return lib_h.subtract_angles(start, end);
@@ -330,7 +330,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "angle between")
+    // @Config(name = "angle between")
     @Overwrite
     public static float angleBetween(float first, float second) {
         return lib_h.angle_between(first, second);
@@ -340,7 +340,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "clamp angle")
+    // @Config(name = "clamp angle")
     @Overwrite
     public static float clampAngle( float value, float mean, float delta) {
         return lib_h.clamp_angle(value, mean, delta);
@@ -350,7 +350,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "step towards")
+    // @Config(name = "step towards")
     @Overwrite
     public static float stepTowards(float from, float to, float step) {
         return lib_h.step_towards(from, to, step);
@@ -360,7 +360,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "step unwrapped towards")
+    // @Config(name = "step unwrapped towards")
     @Overwrite
     public static float stepUnwrappedAngleTowards(float from, float to, float step) {
         return lib_h.step_unwrapped_angle_towards(from, to, step);
@@ -371,7 +371,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "parse int", enabled = false)
+    // @Config(name = "parse int", enabled = false)
     @Overwrite
     public static int parseInt(String string, int fallback) {
         char[] chars = string.toCharArray();
@@ -382,7 +382,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "smallest power of 2")
+    // @Config(name = "smallest power of 2")
     @Overwrite
     public static int smallestEncompassingPowerOfTwo(int value) {
         return lib_h.smallest_encompassing_power_of_two(value);
@@ -392,7 +392,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "is power of 2")
+    // @Config(name = "is power of 2")
     @Overwrite
     public static boolean isPowerOfTwo(int value) {
         return lib_h.is_power_of_two(value);
@@ -402,7 +402,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "ceil log 2")
+    // @Config(name = "ceil log 2")
     @Overwrite
     public static int ceilLog2(int value) {
         return lib_h.ceil_log_2(value);
@@ -412,7 +412,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "floor log 2")
+    // @Config(name = "floor log 2")
     @Overwrite
     public static int floorLog2(int value) {
         return lib_h.floor_log_2(value);
@@ -424,7 +424,7 @@ public class MathHelperMixin {
      * Mojang, if you are reading this, learn how to get the fractional part.
      * Negative values should return negative fractional parts!!!
      */
-    @Config(name = "float fraction")
+    // @Config(name = "float fraction")
     @Overwrite
     public static float fractionalPart(float value) {
         return lib_h.fractional_part_float(value);
@@ -436,7 +436,7 @@ public class MathHelperMixin {
      * Mojang, if you are reading this, learn how to get the fractional part.
      * Negative values should return negative fractional parts!!!
      */
-    @Config(name = "double fraction")
+    // @Config(name = "double fraction")
     @Overwrite
     public static double fractionalPart(double value) {
         return lib_h.fractional_part_double(value);
@@ -446,7 +446,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "hashcode")
+    // @Config(name = "hashcode")
     @Deprecated
     @Overwrite
     public static long hashCode(int x, int y, int z) {
@@ -457,7 +457,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double get lerp")
+    // @Config(name = "double get lerp")
     @Overwrite
     public static double getLerpProgress(double value, double start, double end) {
         return lib_h.get_lerp_progress_double(value, start, end);
@@ -467,7 +467,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float get lerp")
+    // @Config(name = "float get lerp")
     @Overwrite
     public static float getLerpProgress(float value, float start, float end) {
         return lib_h.get_lerp_progress_float(value, start, end);
@@ -477,7 +477,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "atan 2")
+    // @Config(name = "atan 2")
     @Overwrite
     public static double atan2(double y, double x) {
         return lib_h.atan_2(y, x);
@@ -487,7 +487,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float inverse sqrt")
+    // @Config(name = "float inverse sqrt")
     @Overwrite
     public static float inverseSqrt(@Bounded(minInclusive = 1, maxExclusive = 100) float x) {
         return lib_h.inverse_sqrt_float(x);
@@ -497,7 +497,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double inverse sqrt")
+    // @Config(name = "double inverse sqrt")
     @Overwrite
     public static double inverseSqrt(@Bounded(minInclusive = 1, maxExclusive = 100) double x) {
         return lib_h.inverse_sqrt_double(x);
@@ -507,7 +507,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "fast inverse cbrt")
+    // @Config(name = "fast inverse cbrt")
     @Overwrite
     public static float fastInverseCbrt(float x) {
         return lib_h.fast_inverse_cbrt(x);
@@ -517,7 +517,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "hsv to rgb")
+    // @Config(name = "hsv to rgb")
     @Overwrite
     public static int hsvToRgb(@PositiveOnly float hue, @PositiveOnly float saturation, @PositiveOnly float value) {
         return lib_h.hsv_to_rgb(hue, saturation, value);
@@ -527,7 +527,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "hsv to argb")
+    // @Config(name = "hsv to argb")
     @Overwrite
     public static int hsvToArgb(@PositiveOnly float hue, @PositiveOnly float saturation, @PositiveOnly float value, @PositiveOnly int alpha) {
         return lib_h.hsv_to_argb(hue, saturation, value, alpha);
@@ -537,7 +537,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "ideal hash")
+    // @Config(name = "ideal hash")
     @Overwrite
     public static int idealHash(int value) {
         return lib_h.ideal_hash(value);
@@ -547,7 +547,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "int lerp")
+    // @Config(name = "int lerp")
     @Overwrite
     public static int lerp(float delta, int start, int end) {
         return lib_h.lerp_int(delta, start, end);
@@ -557,7 +557,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "lerp positive")
+    // @Config(name = "lerp positive")
     @Overwrite
     public static int lerpPositive(float delta, int start, int end) {
         return lib_h.lerp_positive(delta, start, end);
@@ -567,7 +567,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float lerp")
+    // @Config(name = "float lerp")
     @Overwrite
     public static float lerp(float delta, float start, float end) {
         return lib_h.lerp_float(delta, start, end);
@@ -577,7 +577,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double lerp")
+    // @Config(name = "double lerp")
     @Overwrite
     public static double lerp(double delta, double start, double end) {
         return lib_h.lerp_double(delta, start, end);
@@ -587,7 +587,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "lerp 2")
+    // @Config(name = "lerp 2")
     @Overwrite
     public static double lerp2(double deltaX, double deltaY, double x0y0, double x1y0, double x0y1, double x1y1) {
         return lib_h.lerp_2(deltaX, deltaY, x0y0, x1y0, x0y1, x1y1);
@@ -597,7 +597,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "lerp 3")
+    // @Config(name = "lerp 3")
     @Overwrite
     public static double lerp3(
             double deltaX,
@@ -619,7 +619,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "catmull rom")
+    // @Config(name = "catmull rom")
     @Overwrite
     public static float catmullRom(float delta, float p0, float p1, float p2, float p3) {
         return lib_h.catmull_rom(delta, p0, p1, p2, p3);
@@ -629,7 +629,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "perlin fade")
+    // @Config(name = "perlin fade")
     @Overwrite
     public static double perlinFade(double value) {
         return lib_h.perlin_fade(value);
@@ -639,7 +639,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "perlin fade derive")
+    // @Config(name = "perlin fade derive")
     @Overwrite
     public static double perlinFadeDerivative(double value) {
         return lib_h.perlin_fade_derivative(value);
@@ -649,7 +649,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "sign")
+    // @Config(name = "sign")
     @Overwrite
     public static int sign(double value) {
         return lib_h.sign(value);
@@ -659,7 +659,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float lerp deg")
+    // @Config(name = "float lerp deg")
     @Overwrite
     public static float lerpAngleDegrees(float delta, float start, float end) {
         return lib_h.lerp_angle_degrees_float(delta, start, end);
@@ -669,7 +669,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double lerp deg")
+    // @Config(name = "double lerp deg")
     @Overwrite
     public static double lerpAngleDegrees(double delta, double start, double end) {
         return lib_h.lerp_angle_degrees_double(delta, start, end);
@@ -679,7 +679,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "lerp rad")
+    // @Config(name = "lerp rad")
     @Overwrite
     public static float lerpAngleRadians(float delta, float start, float end) {
         return lib_h.lerp_angle_radians(delta, start, end);
@@ -689,7 +689,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "wrap")
+    // @Config(name = "wrap")
     @Overwrite
     public static float wrap(float value, float maxDeviation) {
         return lib_h.wrap(value, maxDeviation);
@@ -699,7 +699,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float square")
+    // @Config(name = "float square")
     @Overwrite
     public static float square(float n) {
         return lib_h.square_float(n);
@@ -709,7 +709,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double square")
+    // @Config(name = "double square")
     @Overwrite
     public static double square(double n) {
         return lib_h.square_double(n);
@@ -719,7 +719,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "int square")
+    // @Config(name = "int square")
     @Overwrite
     public static int square(int n) {
         return lib_h.square_int(n);
@@ -729,7 +729,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "long square")
+    // @Config(name = "long square")
     @Overwrite
     public static long square(long n) {
         return lib_h.square_long(n);
@@ -739,7 +739,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double clamped map")
+    // @Config(name = "double clamped map")
     @Overwrite
     public static double clampedMap(double value, double oldStart, double oldEnd, double newStart, double newEnd) {
         return lib_h.clamped_map_double(value, oldStart, oldEnd, newStart, newEnd);
@@ -749,7 +749,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float clamped map")
+    // @Config(name = "float clamped map")
     @Overwrite
     public static float clampedMap(float value, float oldStart, float oldEnd, float newStart, float newEnd) {
         return lib_h.clamped_map_float(value, oldStart, oldEnd, newStart, newEnd);
@@ -759,7 +759,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double map")
+    // @Config(name = "double map")
     @Overwrite
     public static double map(double value, double oldStart, double oldEnd, double newStart, double newEnd) {
         return lib_h.map_double(value, oldStart, oldEnd, newStart, newEnd);
@@ -769,7 +769,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float map")
+    // @Config(name = "float map")
     @Overwrite
     public static float map(float value, float oldStart, float oldEnd, float newStart, float newEnd) {
         return lib_h.map_float(value, oldStart, oldEnd, newStart, newEnd);
@@ -779,7 +779,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "round up")
+    // @Config(name = "round up")
     @Overwrite
     public static int roundUpToMultiple(int value, @NonZero int divisor) {
         return lib_h.round_up_to_multiple(value, divisor);
@@ -789,7 +789,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "ceilDiv")
+    // @Config(name = "ceilDiv")
     @Overwrite
     public static int ceilDiv(int a, @NonZero int b) {
         return lib_h.ceil_div(a, b);
@@ -799,7 +799,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "squared hypot")
+    // @Config(name = "squared hypot")
     @Overwrite
     public static double squaredHypot(double a, double b) {
         return lib_h.squared_hypot(a, b);
@@ -809,7 +809,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double hypot")
+    // @Config(name = "double hypot")
     @Overwrite
     public static double hypot(double a, double b) {
         return lib_h.hypot_double(a, b);
@@ -819,7 +819,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float hypot")
+    // @Config(name = "float hypot")
     @Overwrite
     public static float hypot(float a, float b) {
         return lib_h.hypot_float(a, b);
@@ -829,7 +829,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "squared mag")
+    // @Config(name = "squared mag")
     @Overwrite
     public static double squaredMagnitude(double a, double b, double c) {
         return lib_h.squared_magnitude(a, b, c);
@@ -839,7 +839,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "double mag")
+    // @Config(name = "double mag")
     @Overwrite
     public static double magnitude(double a, double b, double c) {
         return lib_h.magnitude_double(a, b, c);
@@ -849,7 +849,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "float mag")
+    // @Config(name = "float mag")
     @Overwrite
     public static float magnitude(float a, float b, float c) {
         return lib_h.magnitude_float(a, b, c);
@@ -859,7 +859,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "round down")
+    // @Config(name = "round down")
     @Overwrite
     public static int roundDownToMultiple(double a, int b) {
         return lib_h.round_down_to_multiple(a, b);
@@ -869,7 +869,7 @@ public class MathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust
      */
-    @Config(name = "ease sin")
+    // @Config(name = "ease sin")
     @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isLithiumOptimizationEnabled", negate = true)
     @Overwrite
     public static float easeInOutSine(float value) {

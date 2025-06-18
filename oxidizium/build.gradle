@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    include(implementation 'com.github.Tater-Certified:MixinConfig:c4c71652bb')
+    // include(implementation 'com.github.Tater-Certified:MixinConfig:c4c71652bb')
 }
 
 processResources {
