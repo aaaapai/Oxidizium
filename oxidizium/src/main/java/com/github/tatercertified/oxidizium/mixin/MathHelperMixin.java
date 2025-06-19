@@ -9,7 +9,7 @@ import org.apache.commons.lang3.math.Fraction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-import java.lang.foreign.MemorySegment;
+// import java.lang.foreign.MemorySegment;
 
 // @Config(name = "Native Math")
 @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isTestingEnabled", negate = true)
