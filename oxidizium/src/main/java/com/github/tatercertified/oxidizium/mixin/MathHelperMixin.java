@@ -4,6 +4,7 @@ package com.github.tatercertified.oxidizium.mixin;
 import com.github.tatercertified.oxidizium.utils.annotation.annotation.*;
 import com.github.tatercertified.rust.lib_h;
 import com.moulberry.mixinconstraints.annotations.IfBoolean;
+import com.moulberry.mixinconstraints.annotations.IfMinecraftVersion;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.math.Fraction;
 import org.spongepowered.asm.mixin.Mixin;
@@ -397,6 +398,7 @@ public class MathHelperMixin {
      * @reason Implement in Rust
      */
     // @Config(name = "smallest square side len")
+    @IfMinecraftVersion(minVersion = "1.21.6")
     @Overwrite
     public static int smallestEncompassingSquareSideLength(@PositiveOnly int value) {
         return lib_h.smallest_encompassing_square_side_length(value);
