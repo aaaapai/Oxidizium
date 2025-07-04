@@ -33,7 +33,7 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
                 default -> throw new IllegalStateException("Unsupported architecture: " + arch);
             };
             outputName = "oxidizium";
-        } else if (SystemUtils.IS_OS_LINUX || osName.contains("Android")) {
+        } else if (SystemUtils.IS_OS_LINUX || osName.contains("android")) {
             binaryName = switch (arch) {
                 case "amd64", "x86_64" -> "liboxidizium_linux_x86.so";
                 case "arm64", "aarch64" -> "liboxidizium_linux_arm64.so";
