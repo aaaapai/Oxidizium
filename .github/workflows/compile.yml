@@ -7,7 +7,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  rust_linux_x86:
+  rust_android_arm64:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
@@ -22,7 +22,7 @@ jobs:
     
     - name: Build Android aarch64
       run: |
-        echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.0.5334843" >> $GITHUB_ENV
+        export ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME
         cd native
         mkdir -p .cargo
         cat <<EOF > .cargo/config.toml
