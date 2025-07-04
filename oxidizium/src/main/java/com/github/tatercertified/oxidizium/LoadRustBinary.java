@@ -55,15 +55,20 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
         copyNativeLib(binaryName, outputName, binaryNameNoExtension);
     }
 
+    public static Path getWorkingDir() {
+        return Paths.get("").toAbsolutePath();
+    }
+
     private static void copyNativeLib(String binaryName, String outputName, String binaryNameNoExt) {
         try (InputStream inputStream = LoadRustBinary.class.getResourceAsStream("/" + binaryName)) {
             if (inputStream == null) {
                 throw new RuntimeException("Resource not found: /" + binaryName);
             }
             Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"));
-            String extension = binaryName.substring(binaryName.lastIndexOf('.') + 1);
-            Path destinationPath = workingDir.resolve(outputName + "." + extension);
+            int lastDotIndex = binaryName.lastIndexOf('.');
+            String extension = binaryName.substring(lastDotIndex + 1);            Path destinationPath = workingDir.resolve(outputName + "." + extension);
 
+            if (Files.notExists(destinationPath) || !HashUtils.checkHash(destinationPath, binaryNameNoExt)) {
             Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
 
             if (!SystemUtils.IS_OS_WINDOWS) {
