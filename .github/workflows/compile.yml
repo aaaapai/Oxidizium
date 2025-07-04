@@ -16,7 +16,7 @@ jobs:
       uses: crusty-pie/toolchain@main
       with:
         toolchain: nightly
-        target: aarch64-linux-android
+        targets: aarch64-linux-android
         profile: minimal
         override: true
     
@@ -30,7 +30,7 @@ jobs:
         linker = "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++"
         EOF
         rustup target add aarch64-linux-android
-        cargo build --target aarch64-linux-android --release -r
+        cargo build --target aarch64-linux-android --release
     - name: Rename
       run: mv native/target/release/liboxidizium.so liboxidizium_linux_x86.so
     - name: Upload
