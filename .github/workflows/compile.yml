@@ -11,11 +11,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: crusty-pie/toolchain@main
+      with:
+        toolchain: nightly
+        target: aarch64-linux-android
+        profile: minimal
+        override: true
+    
     - name: Build x86
       run: |
+        echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.0.5334843" >> $GITHUB_ENV
         cd native
+        cat <<EOF > ./config.toml
+        [target.aarch64-linux-android]
+        ar = "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar"
+        linker = "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++"
+        EOF
         rustup target add aarch64-linux-android
-        cargo build --target aarch64-linux-android -r
+        cargo build --target aarch64-linux-android --release -r
     - name: Rename
       run: mv native/target/release/liboxidizium.so liboxidizium_linux_x86.so
     - name: Upload
@@ -68,7 +83,6 @@ jobs:
         path: |
           oxidizium/build/libs/*.jar
           !oxidizium/build/libs/*-sources.jar
-        compression-level: 0
 
     - name: Upload Oxidizium Tester
       uses: actions/upload-artifact@v4
@@ -77,4 +91,3 @@ jobs:
         path: |
           testMod/build/libs/*.jar
           !testMod/build/libs/*-sources.jar
-        compression-level: 0
