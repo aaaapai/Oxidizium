@@ -66,25 +66,29 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
             }
             Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"));
             int lastDotIndex = binaryName.lastIndexOf('.');
-            String extension = binaryName.substring(lastDotIndex + 1);            Path destinationPath = workingDir.resolve(outputName + "." + extension);
+            String extension = binaryName.substring(lastDotIndex + 1);
+            Path destinationPath = workingDir.resolve(outputName + "." + extension);
 
             if (Files.notExists(destinationPath) || !HashUtils.checkHash(destinationPath, binaryNameNoExt)) {
-            Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
 
-            if (!SystemUtils.IS_OS_WINDOWS) {
-                try {
-                    Set<PosixFilePermission> permissions = Set.of(
+                if (!SystemUtils.IS_OS_WINDOWS) {
+                    try {
+                        Set<PosixFilePermission> permissions = Set.of(
                         PosixFilePermission.OWNER_READ,
                         PosixFilePermission.OWNER_WRITE,
-                        PosixFilePermission.OWNER_EXECUTE
-                    );
-                    Files.setPosixFilePermissions(destinationPath, permissions);
-                } catch (UnsupportedOperationException e) {
-                    Runtime.getRuntime().exec(new String[]{"/system/bin/chmod", "777", destinationPath.toString()});
+                        PosixFilePermission.OWNER_EXECUTE);
+                        Files.setPosixFilePermissions(destinationPath, permissions);
+                        } catch (UnsupportedOperationException e) {
+                                 Runtime.getRuntime().exec(new String[]{"/system/bin/chmod", "777", destinationPath.toString()});
+                        }
+    
                 }
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to copy native library: " + binaryName, e);
-        }
+
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to copy native library: " + binaryName, e);
+            }
     }
+
 }
