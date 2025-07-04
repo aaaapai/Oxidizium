@@ -26,10 +26,10 @@ jobs:
         cd native
         mkdir -p .cargo
         cat <<EOF > .cargo/config.toml
-[target.aarch64-linux-android]
-ar = "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar"
-linker = "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++"
-EOF
+        [target.aarch64-linux-android]
+        ar = "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar"
+        linker = "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang++"
+        EOF
         cargo build --target aarch64-linux-android --release
         
     - name: Rename
