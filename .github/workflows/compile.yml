@@ -33,13 +33,13 @@ jobs:
         cargo build --target aarch64-linux-android --release
         
     - name: Rename
-      run: mv native/target/aarch64-linux-android/release/liboxidizium.so liboxidizium_linux_x86.so
+      run: mv native/target/aarch64-linux-android/release/liboxidizium.so liboxidizium_linux_arm64.so
       
     - name: Upload
       uses: actions/upload-artifact@main
       with:
-        name: liboxidizium_linux_x86.so
-        path: liboxidizium_linux_x86.so
+        name: liboxidizium_linux_arm64.so
+        path: liboxidizium_linux_arm64.so
     - name: Upload C Header File
       uses: actions/upload-artifact@main
       with:
@@ -47,10 +47,10 @@ jobs:
         path: native/lib.h
 
   oxidizium:
-    needs: [rust_linux_x86]
+    needs: [rust_android_arm64]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@main
     - name: Download Rust binaries
       uses: actions/download-artifact@main
       with:
@@ -61,7 +61,7 @@ jobs:
       uses: geekyeggo/delete-artifact@main
       with:
         name: |
-          liboxidizium_linux_x86.so
+          liboxidizium_linux_arm64.so
           lib.h
         failOnError: false
 
@@ -76,7 +76,7 @@ jobs:
       uses: actions/setup-java@main
       with:
         distribution: 'temurin'
-        java-version: 22
+        java-version: 24-ea
 
     - name: Compile Oxidizium Projects
       run: ./gradlew :testMod:build
