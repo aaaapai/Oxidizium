@@ -76,7 +76,8 @@ jobs:
       uses: actions/setup-java@main
       with:
         distribution: 'temurin'
-        java-version: 24-ea
+        java-version: 22
+        cache: gradle
 
     - name: Compile Oxidizium Projects
       run: ./gradlew :testMod:build
