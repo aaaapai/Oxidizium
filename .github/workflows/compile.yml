@@ -14,7 +14,7 @@ jobs:
     - name: Build x86
       run: |
         cd native
-        cargo build -r
+        cargo build --target aarch64-linux-android -r
     - name: Rename
       run: mv native/target/release/liboxidizium.so liboxidizium_linux_x86.so
     - name: Upload
@@ -28,89 +28,8 @@ jobs:
         name: lib.h
         path: native/lib.h
 
-  rust_linux_arm:
-    runs-on: ubuntu-24.04-arm
-    steps:
-    - uses: actions/checkout@v4
-    - name: Build arm
-      run: |
-        cd native
-        cargo build -r
-    - name: Rename
-      run: mv native/target/release/liboxidizium.so liboxidizium_linux_arm64.so
-    - name: Upload
-      uses: actions/upload-artifact@v4
-      with:
-        name: liboxidizium_linux_arm64.so
-        path: liboxidizium_linux_arm64.so
-
-  rust_windows_x86:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Build x86
-      run: |
-        cd native
-        cargo build -r
-    - name: Rename
-      run: mv native/target/release/oxidizium.dll oxidizium_windows_x86.dll
-    - name: Upload
-      uses: actions/upload-artifact@v4
-      with:
-        name: oxidizium_windows_x86.dll
-        path: oxidizium_windows_x86.dll
-
-  rust_windows_arm:
-    runs-on: windows-11-arm
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions-rust-lang/setup-rust-toolchain@v1
-    - name: Build arm
-      run: |
-        cd native
-        cargo build -r
-    - name: Rename
-      run: mv native/target/release/oxidizium.dll oxidizium_windows_arm64.dll
-    - name: Upload
-      uses: actions/upload-artifact@v4
-      with:
-        name: oxidizium_windows_arm64.dll
-        path: oxidizium_windows_arm64.dll
-
-  rust_macos_x86:
-    runs-on: macos-13
-    steps:
-    - uses: actions/checkout@v4
-    - name: Build x86
-      run: |
-        cd native
-        cargo build -r
-    - name: Rename
-      run: mv native/target/release/liboxidizium.dylib liboxidizium_mac_x86.dylib
-    - name: Upload
-      uses: actions/upload-artifact@v4
-      with:
-        name: liboxidizium_mac_x86.dylib
-        path: liboxidizium_mac_x86.dylib
-
-  rust_macos_arm:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Build arm
-      run: |
-        cd native
-        cargo build -r
-    - name: Rename
-      run: mv native/target/release/liboxidizium.dylib liboxidizium_mac_arm64.dylib
-    - name: Upload
-      uses: actions/upload-artifact@v4
-      with:
-        name: liboxidizium_mac_arm64.dylib
-        path: liboxidizium_mac_arm64.dylib
-
   oxidizium:
-    needs: [rust_linux_x86, rust_linux_arm, rust_windows_x86, rust_windows_arm, rust_macos_x86, rust_macos_arm]
+    needs: [rust_linux_x86]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -124,12 +43,7 @@ jobs:
       uses: geekyeggo/delete-artifact@v5
       with:
         name: |
-          liboxidizium_mac_arm64.dylib
-          liboxidizium_mac_x86.dylib
-          liboxidizium_linux_arm64.so
           liboxidizium_linux_x86.so
-          oxidizium_windows_arm64.dll
-          oxidizium_windows_x86.dll
           lib.h
         failOnError: false
 
