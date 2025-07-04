@@ -51,3 +51,4 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
 
         copyNativeLib(binaryName, outputName, binaryNameNoExtension);
     }
+}
