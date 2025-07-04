@@ -1,8 +1,17 @@
+package com.github.tatercertified.oxidizium;
+
+import com.github.tatercertified.oxidizium.utils.HashUtils;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.*;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Locale;
@@ -24,7 +33,7 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
                 default -> throw new IllegalStateException("Unsupported architecture: " + arch);
             };
             outputName = "oxidizium";
-        } else if (SystemUtils.IS_OS_LINUX || osName.contains("android")) { // 兼容 Android 类环境
+        } else if (SystemUtils.IS_OS_LINUX || osName.contains("Android")) {
             binaryName = switch (arch) {
                 case "amd64", "x86_64" -> "liboxidizium_linux_x86.so";
                 case "arm64", "aarch64" -> "liboxidizium_linux_arm64.so";
