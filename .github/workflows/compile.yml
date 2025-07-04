@@ -33,7 +33,8 @@ jobs:
         cargo build --target aarch64-linux-android --release
         
     - name: Rename
-      run: mv native/target/release/liboxidizium.so liboxidizium_linux_x86.so
+      run: mv native/target/aarch64-linux-android/release/liboxidizium.so liboxidizium_linux_x86.so
+      
     - name: Upload
       uses: actions/upload-artifact@main
       with:
