@@ -8,10 +8,12 @@ base {
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
+    maven { url = "https://maven.bawnorton.com/releases" }
 }
 
 dependencies {
     // include(implementation 'com.github.Tater-Certified:MixinConfig:c4c71652bb')
+    include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.3.3")))
 }
 
 processResources {

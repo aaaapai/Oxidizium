@@ -15,6 +15,9 @@
     ],
     "preLaunch": [
       "com.github.tatercertified.oxidizium.LoadRustBinary"
+    ],
+    "mixinsquared": [
+      "com.github.tatercertified.oxidizium.compat.DebugifyMixinCanceller"
     ]
   },
   "mixins": [
