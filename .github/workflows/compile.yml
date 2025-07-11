@@ -23,7 +23,7 @@ jobs:
     - name: Build Android aarch64
       run: |
         export ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME
-        export RUSTFLAGS="-C llvm-args=-mllvm -C llvm-args=-polly -C llvm-args=-polly-parallel"
+        export RUSTFLAGS="-C llvm-args=-polly -C llvm-args=-polly-parallel"
         cd native
         mkdir -p .cargo
         cat <<EOF > .cargo/config.toml
