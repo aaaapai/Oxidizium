@@ -74,13 +74,13 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
 
                 if (!SystemUtils.IS_OS_WINDOWS) {
                     try {
-                        Set<PosixFilePermission> permissions = Set.of(
-                        PosixFilePermission.OWNER_READ,
-                        PosixFilePermission.OWNER_WRITE,
-                        PosixFilePermission.OWNER_EXECUTE);
-                        Files.setPosixFilePermissions(destinationPath, permissions);
+                        Runtime.getRuntime().exec(new String[]{"/system/bin/chmod", "777", destinationPath.toString()});
                         } catch (UnsupportedOperationException e) {
-                                 Runtime.getRuntime().exec(new String[]{"/system/bin/chmod", "777", destinationPath.toString()});
+                                 Set<PosixFilePermission> permissions = Set.of(
+                                 PosixFilePermission.OWNER_READ,
+                                 PosixFilePermission.OWNER_WRITE,
+                                 PosixFilePermission.OWNER_EXECUTE);
+                                 Files.setPosixFilePermissions(destinationPath, permissions);
                         }
     
                 }
