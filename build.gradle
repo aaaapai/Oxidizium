@@ -3,7 +3,7 @@ import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT' apply false
+    id 'fabric-loom' version '1.13-SNAPSHOT' apply false
 }
 
 subprojects {
