@@ -21,7 +21,7 @@ public class LithiumMathHelperMixin {
      */
     // @Config(name = "lithium sin", dependencies = "sin")
     @Overwrite
-    public static float sin(float value) {
+    public static float sin(double value) {
         return lib_h.lithium_sin_float(value);
     }
 
@@ -29,19 +29,9 @@ public class LithiumMathHelperMixin {
      * @author QPCrummer
      * @reason Implement in Rust with Lithium compat
      */
-    // // @Config(name = "lithium cos", dependencies = "cos")
+    // @Config(name = "lithium cos", dependencies = "cos")
     @Overwrite
-    public static float cos(float value) {
+    public static float cos(double value) {
         return lib_h.lithium_cos_float(value);
-    }
-
-    /**
-     * @author QPCrummer
-     * @reason Implement in Rust with Lithium compat
-     */
-    // @Config(name = "lithium ease sin", dependencies = "ease sin")
-    @Overwrite
-    public static float easeInOutSine(float value) {
-        return lib_h.lithium_ease_in_out_sine(value);
     }
 }

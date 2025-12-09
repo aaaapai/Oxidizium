@@ -9,8 +9,6 @@ const MULTIPLY_DE_BRUIJN_BIT_POS: [i8; 32] = [
     12, 18, 6, 11, 5, 10, 9,
 ];
 const ROUNDER_256THS: f64 = f64::from_bits(4805340802404319232);
-const PI: f64 = 3.141592653589793;
-const HALF_PI: f64 = 1.5707963267948966;
 const DOUBLE_PI: f64 = std::f64::consts::PI * 2.0_f64;
 const DOUBLE_PI_F32: f32 = std::f32::consts::PI * 2.0_f32;
 const INVERSE_SQRT: u64 = 6910469410427058090;
@@ -56,8 +54,8 @@ static COSIN_OF_ARCSIN_TABLE: Lazy<[f64; 257]> = Lazy::new(|| {
 
 /// Computes the sine of an input, x, in radians
 #[no_mangle]
-pub extern "C" fn sin_float(x: f32) -> f32 {
-    SINE_TABLE[((x * 10430.378_f32) as i32 & 65535) as usize]
+pub extern "C" fn sin_float(x: f64) -> f32 {
+    SINE_TABLE[((x * 10430.378350470453_f64) as i32 & 65535) as usize]
 }
 
 fn lookup(index: i32) -> f32 {
@@ -75,21 +73,21 @@ fn lookup(index: i32) -> f32 {
 /// Computes the sine of an input, x, in radians
 /// Optimized version from Lithium
 #[no_mangle]
-pub extern "C" fn lithium_sin_float(x: f32) -> f32 {
-    lookup((x * 10430.378_f32) as i32 & 0xFFFF)
+pub extern "C" fn lithium_sin_float(x: f64) -> f32 {
+    lookup((x * 10430.378350470453_f64) as i32 & 0xFFFF)
 }
 
 /// Computes the cosine of an input, x, in radians
 /// Optimized version from Lithium
 #[no_mangle]
-pub extern "C" fn lithium_cos_float(x: f32) -> f32 {
-    lookup((x * 10430.378_f32 + 16384.0_f32) as i32 & 0xFFFF)
+pub extern "C" fn lithium_cos_float(x: f64) -> f32 {
+    lookup((x * 10430.378350470453_f64 + 16384.0_f64) as i32 & 0xFFFF)
 }
 
 /// Computes the cosine of an input, x, in radians
 #[no_mangle]
-pub extern "C" fn cos_float(x: f32) -> f32 {
-    SINE_TABLE[((x * 10430.378_f32 + 16384.0_f32) as i32 & 65535) as usize]
+pub extern "C" fn cos_float(x: f64) -> f32 {
+    SINE_TABLE[((x * 10430.378350470453_f64 + 16384.0_f64) as i32 & 65535) as usize]
 }
 
 /// Square roots the input x
@@ -138,6 +136,12 @@ pub extern "C" fn ceil_float(x: f32) -> i32 {
 #[no_mangle]
 pub extern "C" fn ceil_double(x: f64) -> i32 {
     x.ceil() as i32
+}
+
+/// Ceiling the input x
+#[no_mangle]
+pub extern "C" fn ceil_long(x: f64) -> i64 {
+    x.ceil() as i64
 }
 
 /// Limits the input x between a minimum and maximum value
@@ -196,18 +200,28 @@ pub extern "C" fn clamp_lerp_float(start: f32, end: f32, delta: f32) -> f32 {
     }
 }
 
+/// Gets the largest value from the absolute value of i and j
+#[no_mangle]
+pub extern "C" fn abs_max_int(i: i32, j: i32) -> i32 {
+    i.abs().max(j.abs())
+}
+
+/// Gets the largest value from the absolute value of i and j
+#[no_mangle]
+pub extern "C" fn abs_max_float(i: f32, j: f32) -> f32 {
+    i.abs().max(j.abs())
+}
+
 /// Gets the largest value from the absolute value of a and b
 #[no_mangle]
-pub extern "C" fn abs_max(mut a: f64, mut b: f64) -> f64 {
-    if a < 0.0 {
-        a = -a;
-    }
+pub extern "C" fn abs_max(a: f64, b: f64) -> f64 {
+    a.abs().max(b.abs())
+}
 
-    if b < 0.0 {
-        b = -b;
-    }
-
-    a.max(b)
+/// Gets the largest value from the absolute value of k-i and l-j
+#[no_mangle]
+pub extern "C" fn abs_max_difference(i: i32, j: i32, k: i32, l: i32) -> i32 {
+    abs_max_int(k - i, l - j)
 }
 
 /// Divides then floors
@@ -517,11 +531,11 @@ pub extern "C" fn atan_2(mut y: f64, mut x: f64) -> f64 {
 
         let mut m: f64 = g + l;
         if bl3 {
-            m = HALF_PI - m;
+            m = std::f64::consts::FRAC_PI_2 - m;
         }
 
         if bl2 {
-            m = PI - m;
+            m = std::f64::consts::PI - m;
         }
 
         if bl {
@@ -611,31 +625,6 @@ pub extern "C" fn ideal_hash(mut value: i32) -> i32 {
 /// Rust equivalent of the Java ">>>" operator
 fn signed_shift(value: i32, shift: u32) -> u32 {
     (value as u32) >> shift
-}
-
-// TODO Make compatible with C (F generic is incomaptible)
-/// Performs a binary search looking for the predicate F
-/// The function can be used as show here:
-/// ```rust
-/// let result = binary_search(0, 100, |x| x >= 50);
-/// ```
-//#[no_mangle]
-pub fn binary_search<F>(mut min: i32, max: i32, predicate: F) -> i32
-where
-    F: Fn(i32) -> bool,
-{
-    let mut i = max - min;
-    while i > 0 {
-        let j = i / 2;
-        let k = min + j;
-        if predicate(k) {
-            i = j;
-        } else {
-            min = k + 1;
-            i -= j + 1;
-        }
-    }
-    min
 }
 
 /// Linear Interpolation from start to end over delta time
@@ -924,17 +913,4 @@ pub extern "C" fn round_down_to_multiple(a: f64, b: i32) -> i32 {
 #[no_mangle]
 pub extern "C" fn multiply_fraction(numerator: i32, denominator: i32, multiplier: i32) -> i32 {
     numerator * multiplier / denominator
-}
-
-/// Gradual sine function
-#[no_mangle]
-pub extern "C" fn ease_in_out_sine(value: f32) -> f32 {
-    -(cos_float(std::f32::consts::PI * value) - 1.0_f32) / 2.0_f32
-}
-
-/// Gradual sine function
-/// Compatible with Lithium optimized SineLUT
-#[no_mangle]
-pub extern "C" fn lithium_ease_in_out_sine(value: f32) -> f32 {
-    -(lithium_cos_float(std::f32::consts::PI * value) - 1.0_f32) / 2.0_f32
 }

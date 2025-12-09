@@ -23,7 +23,7 @@ public class MathHelperMixin {
     // @Config(name = "sin")
     @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isLithiumOptimizationEnabled", negate = true)
     @Overwrite
-    public static float sin(float value) {
+    public static float sin(double value) {
         return lib_h.sin_float(value);
     }
 
@@ -34,7 +34,7 @@ public class MathHelperMixin {
     // @Config(name = "cos")
     @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isLithiumOptimizationEnabled", negate = true)
     @Overwrite
-    public static float cos(float value) {
+    public static float cos(double value) {
         return lib_h.cos_float(value);
     }
 
@@ -176,6 +176,33 @@ public class MathHelperMixin {
     @Overwrite
     public static float clampedLerp(float start, float end, float delta) {
         return lib_h.clamp_lerp_float(start, end, delta);
+    }
+
+    /**
+     * @author QPCrummer
+     * @reason Implement in Rust
+     */
+    @Overwrite
+    public static int method_76800(int i, int j) {
+        return lib_h.abs_max_int(i, j);
+    }
+
+    /**
+     * @author QPCrummer
+     * @reason Implement in Rust
+     */
+    @Overwrite
+    public static float method_76799(float f, float g) {
+        return lib_h.abs_max_float(f, g);
+    }
+
+    /**
+     * @author QPCrummer
+     * @reason Implement in Rust
+     */
+    @Overwrite
+    public static int method_76801(int i, int j, int k, int l) {
+        return lib_h.abs_max_difference(i, j, k, l);
     }
 
     /**
@@ -432,6 +459,15 @@ public class MathHelperMixin {
     @Overwrite
     public static int floorLog2(int value) {
         return lib_h.floor_log_2(value);
+    }
+
+    /**
+     * @author QPCrummer
+     * @reason Implement in Rust
+     */
+    @Overwrite
+    public static long ceilLong(double value) {
+        return lib_h.ceil_long(value);
     }
 
     /**
@@ -881,6 +917,15 @@ public class MathHelperMixin {
         return lib_h.round_down_to_multiple(a, b);
     }
 
+    // TODO Figure out how to implement in Rust
+    /*
+    @Overwrite
+    public static Quaternionf rotateAround(Vector3f axis, Quaternionf rotation, Quaternionf result) {
+        // TODO Implement in Rust
+    }
+
+     */
+
     /**
      * @author QPCrummer
      * @reason Implement in Rust
@@ -889,16 +934,5 @@ public class MathHelperMixin {
     @Overwrite
     public static int multiplyFraction(Fraction fraction, int multiplier) {
         return lib_h.multiply_fraction(fraction.getNumerator(), fraction.getDenominator(), multiplier);
-    }
-
-    /**
-     * @author QPCrummer
-     * @reason Implement in Rust
-     */
-    // @Config(name = "ease sin")
-    @IfBoolean(booleanPath = "com.github.tatercertified.oxidizium.Config", booleanMethodName = "isLithiumOptimizationEnabled", negate = true)
-    @Overwrite
-    public static float easeInOutSine(float value) {
-        return lib_h.ease_in_out_sine(value);
     }
 }
