@@ -9,11 +9,16 @@ repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
     maven { url = "https://maven.bawnorton.com/releases" }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+    }
 }
 
 dependencies {
     // include(implementation 'com.github.Tater-Certified:MixinConfig:c4c71652bb')
     include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.3.3")))
+    modImplementation "maven.modrinth:lithium:mc1.21.10-0.20.1-fabric"
 }
 
 processResources {

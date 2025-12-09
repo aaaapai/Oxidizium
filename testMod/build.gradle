@@ -8,6 +8,10 @@ base {
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+    }
 }
 
 dependencies {
