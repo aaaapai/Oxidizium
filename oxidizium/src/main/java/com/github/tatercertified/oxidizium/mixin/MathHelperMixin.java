@@ -164,7 +164,7 @@ public class MathHelperMixin {
      */
     // @Config(name = "double clamped lerp")
     @Overwrite
-    public static double clampedLerp(double start, double end, double delta) {
+    public static double clampedLerp(double delta, double start, double end) {
         return lib_h.clamp_lerp_double(start, end, delta);
     }
 
@@ -174,7 +174,7 @@ public class MathHelperMixin {
      */
     // @Config(name = "float clamped lerp")
     @Overwrite
-    public static float clampedLerp(float start, float end, float delta) {
+    public static float clampedLerp(float delta, float start, float end) {
         return lib_h.clamp_lerp_float(start, end, delta);
     }
 
