@@ -2,6 +2,7 @@ package com.github.tatercertified.oxidizium;
 
 import com.github.tatercertified.oxidizium.utils.HashUtils;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -11,7 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.Locale;
+import java.util.Set;
 
 public class LoadRustBinary implements PreLaunchEntrypoint {
     @Override
@@ -29,7 +33,7 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
                 default -> throw new IllegalStateException("Unsupported architecture: " + arch);
             };
             outputName = "oxidizium";
-        } else if (SystemUtils.IS_OS_LINUX) {
+        } else if (SystemUtils.IS_OS_LINUX || osName.contains("android")) {
             binaryName = switch (arch) {
                 case "amd64", "x86_64" -> "liboxidizium_linux_x86.so";
                 case "arm64", "aarch64" -> "liboxidizium_linux_arm64.so";
@@ -48,12 +52,11 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
         }
 
         String binaryNameNoExtension = FilenameUtils.removeExtension(binaryName);
-
         copyNativeLib(binaryName, outputName, binaryNameNoExtension);
     }
 
     public static Path getWorkingDir() {
-        return Paths.get("").toAbsolutePath();
+        return Paths.get(System.getProperty("java.io.tmpdir"));
     }
 
     private static void copyNativeLib(String binaryName, String outputName, String binaryNameNoExt) {
@@ -65,11 +68,27 @@ public class LoadRustBinary implements PreLaunchEntrypoint {
             int lastDotIndex = binaryName.lastIndexOf('.');
             String extension = binaryName.substring(lastDotIndex + 1);
             Path destinationPath = workingDir.resolve(outputName + "." + extension);
+
             if (Files.notExists(destinationPath) || !HashUtils.checkHash(destinationPath, binaryNameNoExt)) {
                 Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+                if (!SystemUtils.IS_OS_WINDOWS) {
+                    try {
+                        Runtime.getRuntime().exec(new String[]{"/system/bin/chmod", "777", destinationPath.toString()});
+                        } catch (UnsupportedOperationException e) {
+                                 Set<PosixFilePermission> permissions = Set.of(
+                                 PosixFilePermission.OWNER_READ,
+                                 PosixFilePermission.OWNER_WRITE,
+                                 PosixFilePermission.OWNER_EXECUTE);
+                                 Files.setPosixFilePermissions(destinationPath, permissions);
+                        }
+    
+                }
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to copy native library: " + binaryName, e);
+            }
     }
+
 }
